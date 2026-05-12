@@ -75,11 +75,6 @@
       </div>
     </div>
 
-    <!-- כפתורי מצב התחברות / הרשמה -->
-    <div class="auth-mode-toggle">
-      <button [class.active]="authMode === 'login'" (click)="switchAuthMode('login')">התחבר</button>
-      <button [class.active]="authMode === 'register'" (click)="switchAuthMode('register')">הירשם</button>
-    </div>
 
     <div class="form-actions">
       <button class="primary-btn" (click)="handleLocalAuth()">

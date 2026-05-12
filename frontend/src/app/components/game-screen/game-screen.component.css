@@ -4,6 +4,7 @@
     color: #102a43;
 }
 
+/* ===== פס שחקנים ===== */
 .players-panel {
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(148, 163, 184, 0.16);
@@ -49,6 +50,99 @@
     font-size: 0.95rem;
 }
 
+/* ===== מסך סיום — פודיום ===== */
+.finished-card {
+    background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 100%);
+    border-radius: 32px;
+    padding: 2.5rem 2rem;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+}
+
+.finish-header h2 {
+    font-size: 2.2rem;
+    color: #fbbf24;
+    margin: 0 0 0.4rem;
+}
+
+.finish-subtitle {
+    color: #94a3b8;
+    margin-bottom: 2.5rem;
+}
+
+.podium-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.podium-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+}
+
+.podium-card:hover {
+    transform: translateY(-6px);
+}
+
+.medal {
+    font-size: 2rem;
+}
+
+.podium-card img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.2);
+}
+
+.gold img  { border-color: #fbbf24; box-shadow: 0 0 20px rgba(251,191,36,0.4); }
+.silver img { border-color: #cbd5e1; box-shadow: 0 0 16px rgba(203,213,225,0.3); }
+.bronze img { border-color: #d97706; box-shadow: 0 0 14px rgba(217,119,6,0.3); }
+
+.podium-name {
+    font-weight: 800;
+    font-size: 1rem;
+    color: #f1f5f9;
+}
+
+.podium-score {
+    font-size: 0.88rem;
+    color: #94a3b8;
+}
+
+.podium-block {
+    width: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.6);
+    border-radius: 12px 12px 0 0;
+    margin-top: 8px;
+}
+
+.gold-block   { height: 90px;  background: linear-gradient(180deg, #fbbf24, #d97706); color: #fff; }
+.silver-block { height: 65px;  background: linear-gradient(180deg, #e2e8f0, #94a3b8); color: #fff; }
+.bronze-block { height: 48px;  background: linear-gradient(180deg, #fdba74, #c2410c); color: #fff; }
+
+/* מקום ראשון גדול יותר */
+.gold .podium-card img,
+.gold img {
+    width: 88px;
+    height: 88px;
+}
+
+.gold .medal { font-size: 2.5rem; }
+
+/* ===== מסך המתנה ===== */
 .waiting-card,
 .question-card {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), #f8fafc);
@@ -59,53 +153,7 @@
     text-align: center;
 }
 
-/* FIX: עיצוב מסך סיום */
-.finished-card {
-    background: linear-gradient(180deg, #f0fdf4, #dcfce7);
-    border-color: #86efac;
-}
-
-.finished-card h2 {
-    font-size: 2rem;
-    color: #166534;
-    margin-bottom: 0.5rem;
-}
-
-.final-leaderboard {
-    margin-top: 1.5rem;
-    text-align: right;
-}
-
-.final-leaderboard h3 {
-    color: #166534;
-    margin-bottom: 1rem;
-}
-
-.final-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 14px;
-    background: white;
-    border: 1px solid #bbf7d0;
-    margin-bottom: 8px;
-}
-
-.final-row img {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    object-fit: cover;
-}
-
-.rank {
-    font-weight: 800;
-    font-size: 1.1rem;
-    color: #15803d;
-    min-width: 24px;
-}
-
+/* ===== שאלה ===== */
 .question-header {
     display: flex;
     justify-content: space-between;
@@ -144,7 +192,6 @@
     transition: background 0.3s;
 }
 
-/* FIX: טיימר אדום כשנשאר מעט זמן */
 .timer.timer-urgent {
     background: #dc2626;
     animation: pulse 0.5s ease-in-out infinite alternate;
@@ -152,7 +199,7 @@
 
 @keyframes pulse {
     from { transform: scale(1); }
-    to { transform: scale(1.05); }
+    to   { transform: scale(1.05); }
 }
 
 .answers-grid {
@@ -181,7 +228,6 @@
     border-color: #93c5fd;
 }
 
-/* FIX: עיצוב כפתור כשהוא מושבת (אחרי לחיצה) */
 .answer-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -203,6 +249,7 @@
     font-weight: 700;
 }
 
+/* ===== Loader ===== */
 .loader {
     width: 48px;
     height: 48px;
@@ -214,12 +261,12 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
+    0%   { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 660px) {
-    .answers-grid {
-        grid-template-columns: 1fr;
-    }
+    .answers-grid { grid-template-columns: 1fr; }
+    .podium-wrapper { gap: 12px; }
+    .podium-block { width: 70px; }
 }

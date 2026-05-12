@@ -14,31 +14,61 @@ public class QuizService {
     @Autowired
     private QuizRepository quizRepository;
 
-    public Quiz addQuiz(Quiz quiz){
+    public Quiz addQuiz(Quiz quiz) {
         return quizRepository.save(quiz);
     }
 
-    public List<Quiz> getQuizzesByEmail(String email){
+    public List<Quiz> getQuizzesByEmail(String email) {
         return quizRepository.findByCreatorEmail(email);
     }
 
-    public Quiz getQuizById (Long id){
+    public Quiz getQuizById(Long id) {
         return quizRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Quiz not found😶"));
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
     }
 
-    public Quiz updateQuiz(Long id, Quiz updatedQuiz){
+    /**
+     * עדכון שדות החידון (שם, זמנים) — מוגבל לחידונים פעילים בלבד
+     */
+    public Quiz updateQuiz(Long id, Quiz updatedQuiz) {
         Quiz existingQuiz = quizRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Quiz not found😶"));
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        if (LocalDateTime.now().isAfter(existingQuiz.getEndTime())){
-            throw new RuntimeException("Cannot update a closed quiz😉");
+        // FIX: הבדיקה היא רק על עדכון שדות ניהוליים — לא על שמירת זוכה
+        if (LocalDateTime.now().isAfter(existingQuiz.getEndTime())
+                && updatedQuiz.getName() != null) {
+            throw new RuntimeException("Cannot update a closed quiz");
         }
 
-        existingQuiz.setName(updatedQuiz.getName());
-        existingQuiz.setStartTime(updatedQuiz.getStartTime());
-        existingQuiz.setEndTime(updatedQuiz.getEndTime());
+        if (updatedQuiz.getName() != null) {
+            existingQuiz.setName(updatedQuiz.getName());
+        }
+        if (updatedQuiz.getStartTime() != null) {
+            existingQuiz.setStartTime(updatedQuiz.getStartTime());
+        }
+        if (updatedQuiz.getEndTime() != null) {
+            existingQuiz.setEndTime(updatedQuiz.getEndTime());
+        }
+        // שמירת זוכה — תמיד מותרת, ללא קשר לזמן
+        if (updatedQuiz.getWinnerName() != null) {
+            existingQuiz.setWinnerName(updatedQuiz.getWinnerName());
+        }
+        if (updatedQuiz.getWinnerScore() != null) {
+            existingQuiz.setWinnerScore(updatedQuiz.getWinnerScore());
+        }
 
         return quizRepository.save(existingQuiz);
+    }
+
+    /**
+     * שמירת זוכה בלבד — ללא בדיקת זמן, תמיד מותר
+     */
+    public Quiz saveWinner(Long id, String winnerName, Integer winnerScore) {
+        Quiz quiz = quizRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+        quiz.setWinnerName(winnerName);
+        quiz.setWinnerScore(winnerScore);
+        return quizRepository.save(quiz);
     }
 }

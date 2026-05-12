@@ -31,14 +31,21 @@ public class PlayerController {
         }
     }
 
+    // FIX: מקבל playerId כדי לשלוף את השאלה האישית של כל שחקן
     @GetMapping("/question/{quizId}")
-    public ResponseEntity<?> getSyncQuestion(@PathVariable Long quizId) {
-        // FIX: כשהחידון נגמר מחזירים 204 No Content — Angular יזהה סיום
-        Question question = playerService.getSyncQuestion(quizId);
-        if (question == null) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> getSyncQuestion(
+            @PathVariable Long quizId,
+            @RequestParam String playerId) {
+        try {
+            Question question = playerService.getSyncQuestion(quizId, playerId);
+            if (question == null) {
+                return ResponseEntity.noContent().build(); // 204 = סיום חידון
+            }
+            return ResponseEntity.ok(question);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
-        return ResponseEntity.ok(question);
     }
 
     @PostMapping("/submit")
@@ -50,8 +57,8 @@ public class PlayerController {
             Map<String, Object> result = playerService.submitAnswer(quizId, playerId, answer);
             return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
-            // FIX: טיפול בשגיאה אם השחקן לא נמצא
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 

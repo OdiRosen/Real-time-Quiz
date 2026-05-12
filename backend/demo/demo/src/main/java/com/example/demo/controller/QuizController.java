@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/quiz")
@@ -26,11 +27,9 @@ public class QuizController {
     @Autowired
     private QuizService quizService;
 
-    // FIX: endpoint ליצירת חידון חדש — זה מה ש-Angular קורא
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz) {
         try {
-            quiz.setId(null);
             Quiz saved = quizRepository.save(quiz);
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
@@ -38,12 +37,10 @@ public class QuizController {
         }
     }
 
-    // FIX: endpoint לקבלת כל החידונים של מנהל לפי אימייל
     @GetMapping
     public ResponseEntity<List<Quiz>> getQuizzesByEmail(@RequestParam String email) {
         try {
-            List<Quiz> quizzes = quizService.getQuizzesByEmail(email);
-            return ResponseEntity.ok(quizzes);
+            return ResponseEntity.ok(quizService.getQuizzesByEmail(email));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -56,14 +53,30 @@ public class QuizController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // FIX: endpoint לעדכון חידון קיים
     @PutMapping("/{id}")
-    public ResponseEntity<Quiz> updateQuiz(@PathVariable Long id, @RequestBody Quiz updatedQuiz) {
+    public ResponseEntity<?> updateQuiz(@PathVariable Long id, @RequestBody Quiz updatedQuiz) {
         try {
             Quiz updated = quizService.updateQuiz(id, updatedQuiz);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // FIX: endpoint נפרד לשמירת זוכה — ללא בדיקת זמן
+    @PatchMapping("/{id}/winner")
+    public ResponseEntity<?> saveWinner(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> body) {
+        try {
+            String winnerName = (String) body.get("winnerName");
+            Integer winnerScore = (Integer) body.get("winnerScore");
+            Quiz updated = quizService.saveWinner(id, winnerName, winnerScore);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 

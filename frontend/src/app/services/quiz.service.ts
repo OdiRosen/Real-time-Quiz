@@ -39,4 +39,12 @@ export class QuizService {
   updateQuiz(id: number, quiz: Partial<Quiz>): Observable<Quiz> {
     return this.http.put<Quiz>(`${this.apiUrl}/${id}`, quiz);
   }
+
+    saveWinner(quizId: number, winnerName: string, winnerScore: number): Observable<Quiz> {
+    return this.http.patch<Quiz>(`${this.apiUrl}/${quizId}/winner`, {
+      winnerName,
+      winnerScore
+    });
+  }
+
 }

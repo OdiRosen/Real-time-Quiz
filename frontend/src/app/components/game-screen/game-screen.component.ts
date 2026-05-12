@@ -1,9 +1,10 @@
-import { Component, OnDestroy, Input, inject, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnDestroy, Input, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { PlayerService } from '../../services/player.service';
-import { ChangeDetectorRef } from '@angular/core';
+import { QuizService } from '../../services/quiz.service';
+
 @Component({
   selector: 'app-game-screen',
   standalone: true,
@@ -26,16 +27,15 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
 
   timeLeft = 10;
   maxTime = 10;
-  timerInterval: any;
+  timerInterval: any = null;
 
   private leaderboardSub: Subscription | null = null;
   private playerService = inject(PlayerService);
+  private quizService = inject(QuizService);
+  private cdr = inject(ChangeDetectorRef);
 
-  ngOnInit() {
-    // לא עושים כלום כאן — מחכים ל-ngOnChanges שיגיע עם הערכים האמיתיים
-  }
+  ngOnInit() {}
 
-  // FIX: ngOnChanges מופעל בכל פעם שה-@Input משתנה — כולל הפעם הראשונה
   ngOnChanges(changes: SimpleChanges) {
     const playerReady = this.player && (this.player.playerId || this.player.id);
     const quizReady = this.quizId && this.quizId > 0;
@@ -50,31 +50,38 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.leaderboardSub?.unsubscribe();
-    if (this.timerInterval) clearInterval(this.timerInterval);
+    this.clearTimer();
   }
 
-  calculateOffset(): number {
-    const circleLength = 283;
-    return circleLength - (this.timeLeft / this.maxTime) * circleLength;
+  private clearTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
   }
 
   loadQuestionFromServer() {
     if (this.isFinished) return;
 
+    this.clearTimer();
     this.isAnswering = false;
-    this.playerService.getSyncQuestion(this.quizId).subscribe({
+    this.currentQuestion = null;
+    this.statusMessage = 'טוען שאלה...';
+    this.cdr.detectChanges();
+
+    this.playerService.getSyncQuestion(this.quizId, this.playerId).subscribe({
       next: (response: any) => {
         if (response.status === 204 || !response.body) {
-          this.currentQuestion = null;
           this.isFinished = true;
+          this.currentQuestion = null;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
-          if (this.timerInterval) clearInterval(this.timerInterval);
+          this.saveFinalWinner();
+          this.cdr.detectChanges();
           return;
         }
 
         const question = response.body;
         this.currentQuestion = question;
-
         this.shuffledAnswers = [
           question.answer1,
           question.answer2,
@@ -84,49 +91,69 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
          .sort(() => Math.random() - 0.5);
 
         this.statusMessage = '';
+        this.cdr.detectChanges();
         this.startTimer();
       },
       error: (err: any) => {
-        if (err.status === 204 || err.status === 0) {
+        if (err.status === 204) {
           this.isFinished = true;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
+          this.saveFinalWinner();
         } else {
           this.statusMessage = 'שגיאה בטעינת השאלה. מנסה שוב...';
-          setTimeout(() => this.loadQuestionFromServer(), 2000);
+          setTimeout(() => this.loadQuestionFromServer(), 1500);
         }
-        if (this.timerInterval) clearInterval(this.timerInterval);
+        this.cdr.detectChanges();
       }
     });
   }
 
   startTimer() {
+    this.clearTimer();
     this.timeLeft = this.maxTime;
-    if (this.timerInterval) clearInterval(this.timerInterval);
+    this.cdr.detectChanges();
 
     this.timerInterval = setInterval(() => {
       if (this.timeLeft > 0) {
         this.timeLeft--;
+        this.cdr.detectChanges();
       } else {
+        this.clearTimer();
         this.handleTimeout();
       }
     }, 1000);
   }
 
   handleTimeout() {
-    clearInterval(this.timerInterval);
     this.statusMessage = 'נגמר הזמן! ⏰';
-    setTimeout(() => this.loadQuestionFromServer(), 1500);
+    this.isAnswering = true;
+    this.cdr.detectChanges();
+
+    this.playerService.submitAnswer(this.quizId, this.playerId, 'TIMEOUT').subscribe({
+      next: (res: any) => {
+        if (res.status === 'finished') {
+          this.isFinished = true;
+          this.currentQuestion = null;
+          this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
+          this.saveFinalWinner();
+          this.cdr.detectChanges();
+          return;
+        }
+        setTimeout(() => this.loadQuestionFromServer(), 1500);
+      },
+      error: () => {
+        this.isAnswering = false;
+        setTimeout(() => this.loadQuestionFromServer(), 1500);
+      }
+    });
   }
 
   onAnswer(selectedAnswer: string) {
     if (!this.currentQuestion || this.isFinished || this.isAnswering) return;
-    this.isAnswering = true;
-    clearInterval(this.timerInterval);
 
-    if (!this.playerId) {
-      this.statusMessage = 'שגיאה: מזהה שחקן חסר.';
-      return;
-    }
+    this.clearTimer();
+    this.isAnswering = true;
+    this.cdr.detectChanges();
 
     this.playerService.submitAnswer(this.quizId, this.playerId, selectedAnswer).subscribe({
       next: (res: any) => {
@@ -134,19 +161,24 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
           this.isFinished = true;
           this.currentQuestion = null;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
+          this.saveFinalWinner();
+          this.cdr.detectChanges();
           return;
         }
-        if (res.status === 'success') {
-          this.statusMessage = res.correct ? 'כל הכבוד! תשובה נכונה ✨' : 'טעות... לא נורא 😕';
-        } else if (res.status === 'timeout') {
+
+        if (res.status === 'timeout') {
           this.statusMessage = 'איחרת את המועד! ⏰';
+        } else {
+          this.statusMessage = res.correct === true ? 'כל הכבוד! ✨' : 'טעות... 😕';
         }
+
+        this.cdr.detectChanges();
         setTimeout(() => this.loadQuestionFromServer(), 2000);
       },
-      error: (err: any) => {
+      error: () => {
         this.statusMessage = 'שגיאה בשליחת התשובה.';
         this.isAnswering = false;
-        console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -159,19 +191,37 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
             const uniquePlayers = new Map<string, any>();
             data.forEach((item: any) => {
               const playerName = (item.displayName || item.name || 'שחקן').trim();
-              const avatar = item.image || '/assets/avatar1.png';
-              const score = item.score ?? 0;
               const key = playerName.toLowerCase();
-
+              const score = item.score ?? 0;
               const existing = uniquePlayers.get(key);
               if (!existing || score > existing.score) {
-                uniquePlayers.set(key, { playerName, avatar, score });
+                uniquePlayers.set(key, {
+                  playerName,
+                  avatar: item.image || 'assets/avatar1.png',
+                  score
+                });
               }
             });
             this.players = Array.from(uniquePlayers.values());
+            this.cdr.detectChanges();
           }
         },
         error: (err: any) => console.error('Leaderboard update failed', err)
       });
+  }
+
+  // FIX: שימוש ב-saveWinner במקום updateQuiz — לא מוגבל בזמן
+  saveFinalWinner() {
+    if (this.players.length > 0) {
+      const winner = this.players[0];
+      this.quizService.saveWinner(this.quizId, winner.playerName, winner.score).subscribe({
+        next: () => console.log('הזוכה נשמר בהצלחה!'),
+        error: (err) => console.error('שגיאה בשמירת הזוכה:', err)
+      });
+    }
+  }
+
+  calculateOffset(): number {
+    return 283 - (this.timeLeft / this.maxTime) * 283;
   }
 }

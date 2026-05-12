@@ -1,6 +1,7 @@
 package com.example.demo.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "quizzes")
@@ -18,6 +19,16 @@ public class Quiz {
     private String winnerName;
     private Integer winnerScore;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "quiz_id") // זה ייצור עמודה בטבלת השאלות שתקשר אותן לחידון
+    private List<Question> questions;
+
+    public Quiz() {} // בנאי ריק חובה
+
+    public Quiz(String name, String creatorEmail) {
+        this.name = name;
+        this.creatorEmail = creatorEmail;
+    }
     // Getters and setters
     public Long getId() {
         return id;

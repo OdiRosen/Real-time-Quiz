@@ -1,5 +1,7 @@
 <div class="game-container">
-  <section class="players-panel">
+
+  <!-- פס שחקנים עליון — מוצג תמיד בזמן המשחק -->
+  <section class="players-panel" *ngIf="!isFinished">
     <div class="players-strip">
       <div *ngFor="let p of players" class="player-card">
         <img [src]="p.avatar || '/assets/avatar1.png'" alt="{{ p.playerName }}" />
@@ -11,19 +13,45 @@
     </div>
   </section>
 
-  <!-- מסך סיום -->
-  <section *ngIf="isFinished" class="waiting-card finished-card">
-    <h2>🏆 החידון הסתיים!</h2>
-    <p>{{ statusMessage }}</p>
-    <div *ngIf="players.length > 0" class="final-leaderboard">
-      <h3>תוצאות סופיות:</h3>
-      <div *ngFor="let p of players; let i = index" class="final-row">
-        <span class="rank">{{ i + 1 }}</span>
-        <img [src]="p.avatar || '/assets/avatar1.png'" alt="{{ p.playerName }}" />
-        <span class="player-name">{{ p.playerName }}</span>
-        <span class="player-score">{{ p.score }} נקודות</span>
-      </div>
+  <!-- מסך סיום — 3 מנצחים בלבד -->
+  <section *ngIf="isFinished" class="finished-card">
+    <div class="finish-header">
+      <h2>🏆 החידון הסתיים!</h2>
+      <p class="finish-subtitle">תודה שהשתתפת — הנה תוצאות הגמר</p>
     </div>
+
+    <div *ngIf="players.length > 0" class="podium-wrapper">
+
+      <!-- מקום ראשון -->
+      <div class="podium-card gold" *ngIf="players[0]">
+        <div class="medal">🥇</div>
+        <img [src]="players[0].avatar || '/assets/avatar1.png'" alt="{{ players[0].playerName }}" />
+        <span class="podium-name">{{ players[0].playerName }}</span>
+        <span class="podium-score">{{ players[0].score }} נקודות</span>
+        <div class="podium-block gold-block">1</div>
+      </div>
+
+      <!-- מקום שני -->
+      <div class="podium-card silver" *ngIf="players[1]">
+        <div class="medal">🥈</div>
+        <img [src]="players[1].avatar || '/assets/avatar1.png'" alt="{{ players[1].playerName }}" />
+        <span class="podium-name">{{ players[1].playerName }}</span>
+        <span class="podium-score">{{ players[1].score }} נקודות</span>
+        <div class="podium-block silver-block">2</div>
+      </div>
+
+      <!-- מקום שלישי -->
+      <div class="podium-card bronze" *ngIf="players[2]">
+        <div class="medal">🥉</div>
+        <img [src]="players[2].avatar || '/assets/avatar1.png'" alt="{{ players[2].playerName }}" />
+        <span class="podium-name">{{ players[2].playerName }}</span>
+        <span class="podium-score">{{ players[2].score }} נקודות</span>
+        <div class="podium-block bronze-block">3</div>
+      </div>
+
+    </div>
+
+    <div *ngIf="players.length === 0" class="hint">אין נתוני שחקנים להצגה.</div>
   </section>
 
   <!-- מסך המתנה/טעינה -->
@@ -37,7 +65,6 @@
   <section *ngIf="currentQuestion && !isFinished" class="question-card">
     <div class="question-header">
       <div>
-        <!-- FIX: תוקן מ-currentQuestion.text ל-currentQuestion.questionText -->
         <span class="level-chip" *ngIf="currentQuestion.difficulty">רמת קושי: {{ currentQuestion.difficulty }}</span>
         <h3>{{ currentQuestion.questionText }}</h3>
       </div>
@@ -45,7 +72,6 @@
     </div>
 
     <div class="answers-grid">
-      <!-- FIX: הוספת [disabled]="isAnswering" למניעת לחיצה כפולה -->
       <button
         *ngFor="let ans of shuffledAnswers"
         class="answer-btn"
@@ -60,4 +86,5 @@
       <span class="small-text">{{ statusMessage }}</span>
     </div>
   </section>
+
 </div>

@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.util.List;
+
 public class Player {
     private String playerId;
     private String displayName;
@@ -7,7 +9,7 @@ public class Player {
     private int score;
     private int currentQuestionIndex = 0;
     private long totalTimeTaken;
-
+    private List<Long> questionOrder;
     // Getters and setters
     public String getPlayerId() {
         return playerId;

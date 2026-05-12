@@ -26,8 +26,10 @@ export class PlayerService {
    * משיכת השאלה הנוכחית
    * FIX: הוספת observe: 'response' כדי לזהות 204 No Content (סיום חידון)
    */
-  getSyncQuestion(quizId: number): Observable<any> {
+  getSyncQuestion(quizId: number, playerId: string): Observable<any> {
+    const params = new HttpParams().set('playerId', playerId); // מוסיף את ה-ID לכתובת
     return this.http.get<any>(`${this.apiUrl}/question/${quizId}`, {
+      params,
       observe: 'response'  // FIX: מקבלים את כל ה-response כדי לבדוק status 204
     });
   }
@@ -59,4 +61,15 @@ export class PlayerService {
       )
     );
   }
+  finishGame(quizId: number, winner: any) {
+  const updateData = {
+    winnerName: winner.name,
+    winnerScore: winner.score
+  };
+  
+  this.http.put(`/api/admin/quiz/${quizId}`, updateData).subscribe(
+    response => console.log('הזוכה נשמר בהצלחה!'),
+    error => console.error('שגיאה בשמירת הזוכה', error)
+  );
+}
 }
