@@ -1,0 +1,289 @@
+<div class="app-shell">
+  <header class="app-navbar">
+    <div class="app-brand">
+      <span class="brand-logo">Q</span>
+      <div>
+        <span class="brand-name">Real-time Quiz</span>
+        <span class="brand-tag">מערכת חידונים בזמן אמת</span>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <button *ngIf="!currentUser" class="text-button" (click)="openAuth()">התחבר / הירשם</button>
+      <div *ngIf="currentUser" class="user-panel">
+        <img class="user-avatar" [src]="currentUser.photoUrl || '/assets/avatar1.png'" alt="Avatar" />
+        <span class="nav-user">שלום {{ currentUser.name }}</span>
+        <button class="text-button" (click)="resetRole()">התנתק</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- מסך התחברות -->
+  <section *ngIf="screen === 'auth'" class="panel glass auth-panel">
+    <div class="section-header">
+      <div>
+        <h1>התחבר / הירשם</h1>
+        <p class="subtitle">בחר תפקיד, מלא פרטים או התחבר עם Google כדי להמשיך.</p>
+      </div>
+      <button class="text-button" (click)="resetRole()">חזרה</button>
+    </div>
+
+    <div class="role-selection-wrapper">
+      <h3>מי את/ה היום?</h3>
+      <div class="role-cards-container">
+        <div class="role-card"
+             [class.active]="selectedRole === 'player'"
+             (click)="selectedRole = 'player'">
+          <div class="role-icon">🎮</div>
+          <div class="role-info">
+            <span class="role-title">שחקן</span>
+            <span class="role-desc">רוצה להצטרף לחידון ולנצח</span>
+          </div>
+          <div class="check-mark">✓</div>
+        </div>
+
+        <div class="role-card"
+             [class.active]="selectedRole === 'admin'"
+             (click)="selectedRole = 'admin'">
+          <div class="role-icon">🛠️</div>
+          <div class="role-info">
+            <span class="role-title">מנהל</span>
+            <span class="role-desc">יצירה וניהול של חידונים</span>
+          </div>
+          <div class="check-mark">✓</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="input-card" *ngIf="selectedRole === 'admin' && authMode === 'register'">
+        <label>קוד גישה מנהלי</label>
+        <input [(ngModel)]="adminVerificationCode" placeholder="הזן קוד אימות מנהל" />
+        <p class="hint small">נדרש אימות נוסף רק בהירשמות ראשונה כמנהל.</p>
+      </div>
+      <div class="input-card" *ngIf="authMode === 'register'">
+        <label>שם מלא</label>
+        <input [(ngModel)]="authName" placeholder="הכנס שם מלא" />
+      </div>
+      <div class="input-card">
+        <label>אימייל</label>
+        <input [(ngModel)]="authEmail" placeholder="name@example.com" />
+      </div>
+      <div class="input-card">
+        <label>סיסמה</label>
+        <input type="password" [(ngModel)]="authPassword" placeholder="סיסמה" />
+      </div>
+    </div>
+
+    <!-- כפתורי מצב התחברות / הרשמה -->
+    <div class="auth-mode-toggle">
+      <button [class.active]="authMode === 'login'" (click)="switchAuthMode('login')">התחבר</button>
+      <button [class.active]="authMode === 'register'" (click)="switchAuthMode('register')">הירשם</button>
+    </div>
+
+    <div class="form-actions">
+      <button class="primary-btn" (click)="handleLocalAuth()">
+        {{ authMode === 'login' ? 'התחבר' : 'הירשם' }}
+      </button>
+      <button class="google-btn" (click)="triggerGoogleSignIn()" type="button">
+        <span class="google-btn__icon">
+          <svg viewBox="0 0 24 24" class="google-icon" aria-hidden="true">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+        </span>
+        התחבר עם Google
+      </button>
+    </div>
+
+    <p class="hint">{{ authMessage || 'בחר תפקיד ומידע לאימות כדי להתחבר או להירשם.' }}</p>
+  </section>
+
+  <!-- מסך שחקן -->
+  <section *ngIf="screen === 'player'" class="panel glass">
+    <div class="section-header">
+      <div>
+        <h1>ברוך הבא, {{ playerName || 'שחקן' }}</h1>
+        <p class="subtitle">הזן קוד חידון כדי להצטרף למשחק.</p>
+      </div>
+      <button class="text-button" (click)="resetRole()">יציאה</button>
+    </div>
+
+    <div class="form-grid player-info-grid">
+      <div class="input-card">
+        <label>קוד חידון</label>
+        <input [(ngModel)]="quizCode" placeholder="הכנס קוד מספרי" type="number" />
+      </div>
+      <div class="profile-card" *ngIf="currentUser">
+        <img [src]="currentUser.photoUrl || defaultAvatar" alt="User avatar" />
+        <div>
+          <span class="profile-name">{{ currentUser.name }}</span>
+          <span class="profile-role">{{ currentUser.role === 'admin' ? 'מנהל' : 'שחקן' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="primary-btn" (click)="onPlayerJoin()" [disabled]="!quizCode">הצטרף והתחל</button>
+    </div>
+
+    <p class="hint" [class.error-hint]="playerMessage.includes('שגיאה') || playerMessage.includes('סגור')">
+      {{ playerMessage || 'הזן קוד חידון והצטרף למשחק.' }}
+    </p>
+
+    <app-game-screen *ngIf="isJoined" [player]="playerData" [quizId]="selectedQuizId"></app-game-screen>
+  </section>
+
+  <!-- מסך מנהל -->
+  <section *ngIf="screen === 'admin'" class="panel glass admin-portal">
+    <div class="section-header">
+      <div>
+        <h1>ממשק מנהל</h1>
+        <p class="subtitle">ברוך הבא, {{ adminName || adminEmail || 'מנהל' }}</p>
+      </div>
+      <button class="text-button" (click)="resetRole()">יציאה</button>
+    </div>
+
+    <div *ngIf="adminActionSelected === null" class="role-selection-wrapper">
+      <div class="role-cards-container">
+        <div class="role-card" (click)="adminActionSelected = 'list'">
+          <div class="role-icon">📋</div>
+          <div class="role-info">
+            <span class="role-title">רשימת חידונים</span>
+            <span class="role-desc">ניהול חידונים קיימים, עריכה וצפייה בתוצאות</span>
+          </div>
+        </div>
+
+        <div class="role-card" (click)="adminActionSelected = 'create'">
+          <div class="role-icon">✨</div>
+          <div class="role-info">
+            <span class="role-title">יצירת חידון</span>
+            <span class="role-desc">הגדרת חידון חדש והעלאת שאלות למערכת</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="adminActionSelected !== null" class="admin-content-area">
+      <button class="text-button" (click)="adminActionSelected = null" style="margin-bottom: 20px;">
+        <span dir="ltr">←</span> חזור לתפריט הראשי
+      </button>
+
+      <!-- רשימת חידונים -->
+      <div *ngIf="adminActionSelected === 'list'">
+
+        <!-- spinner בזמן טעינה -->
+        <div *ngIf="isLoadingQuizzes" class="loading-row">
+          <div class="mini-loader"></div>
+          <span>טוען חידונים מהשרת...</span>
+        </div>
+
+        <!-- הרשימה -->
+        <div *ngIf="!isLoadingQuizzes" class="quiz-panel">
+          <div class="quiz-list-card">
+            <h3>חידונים שלי</h3>
+
+            <div *ngIf="quizzes.length === 0" class="hint" style="text-align:center; padding: 2rem;">
+              אין חידונים עדיין. צור חידון חדש!
+            </div>
+
+            <div class="quiz-list">
+              <article *ngFor="let quiz of quizzes"
+                       class="quiz-card"
+                       [class.selected]="selectedQuiz?.id === quiz.id"
+                       (click)="selectQuiz(quiz)">
+                <div class="quiz-meta">
+                  <span class="quiz-id">#{{ quiz.id }}</span>
+                  <span class="status-chip" [class.status-closed]="quiz.status === 'סגור'">
+                    {{ quiz.status }}
+                  </span>
+                </div>
+                <h4>{{ quiz.title }}</h4>
+                <p class="quiz-dates">
+                  {{ quiz.start | date:'dd/MM/yy HH:mm' }} — {{ quiz.end | date:'dd/MM/yy HH:mm' }}
+                </p>
+              </article>
+            </div>
+          </div>
+
+          <div class="quiz-details-card">
+            <div *ngIf="selectedQuiz; else noQuizSelected">
+              <h3>עריכת חידון #{{ selectedQuiz.id }}</h3>
+              <div class="editor-grid">
+                <div class="input-card">
+                  <label>שם החידון</label>
+                  <input [(ngModel)]="selectedQuiz.title" />
+                </div>
+                <div class="input-card">
+                  <label>זמן פתיחה</label>
+                  <input type="datetime-local" [(ngModel)]="selectedQuiz.start" />
+                </div>
+                <div class="input-card">
+                  <label>זמן סגירה</label>
+                  <input type="datetime-local" [(ngModel)]="selectedQuiz.end" />
+                </div>
+              </div>
+              <button class="primary-btn" (click)="saveQuizUpdate()" style="margin-top: 15px;">שמור שינויים</button>
+            </div>
+            <ng-template #noQuizSelected>
+              <p class="hint">בחר חידון מהרשימה כדי לערוך</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- יצירת חידון חדש -->
+      <div *ngIf="adminActionSelected === 'create'">
+        <div class="create-quiz-card" style="width: 100%; max-width: 800px; margin: 0 auto;">
+          <h3>צור חידון חדש</h3>
+          <p class="hint" style="margin-bottom: 1rem;">הקוד יוקצה אוטומטית על ידי המערכת.</p>
+          <div class="editor-grid">
+            <div class="input-card">
+              <label>שם חידון</label>
+              <input [(ngModel)]="newQuiz.title" placeholder="חידון ידע כללי" />
+            </div>
+          </div>
+          <div class="editor-grid" style="margin-top: 15px;">
+            <div class="input-card">
+              <label>זמן פתיחה</label>
+              <input type="datetime-local" [(ngModel)]="newQuiz.start" />
+            </div>
+            <div class="input-card">
+              <label>זמן סגירה</label>
+              <input type="datetime-local" [(ngModel)]="newQuiz.end" />
+            </div>
+          </div>
+          <div class="editor-grid" style="margin-top: 15px;">
+            <div class="input-card">
+              <label>קובץ שאלות (Excel)</label>
+              <input type="file" accept=".xlsx,.xls" (change)="handleFileInput($event)" />
+              <p class="hint small">בחר קובץ Excel עם עמודות: שאלה, תשובה 1, תשובה 2, תשובה 3, תשובה 4, נקודות.</p>
+            </div>
+            <div class="input-card">
+              <label>איך להתייחס לשאלות קיימות?</label>
+              <div class="radio-group">
+                <label>
+                  <input type="radio" name="uploadChoice" value="replace" [(ngModel)]="uploadChoice" /> החלף שאלות קיימות
+                </label>
+                <label>
+                  <input type="radio" name="uploadChoice" value="add" [(ngModel)]="uploadChoice" /> הוסף לשאלות קיימות
+                </label>
+              </div>
+              <p class="hint small">אם לא תבחר קובץ, ייווצר חידון ללא שאלות.</p>
+            </div>
+          </div>
+          <button class="primary-btn" (click)="createNewQuiz()" style="margin-top: 20px; width: 100%;">
+            צור חידון עכשיו
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" *ngIf="message" style="margin-top: 20px;"
+       [class.error-hint]="message.includes('שגיאה')">
+      {{ message }}
+    </p>
+  </section>
+</div>

@@ -1,0 +1,63 @@
+<div class="game-container">
+  <section class="players-panel">
+    <div class="players-strip">
+      <div *ngFor="let p of players" class="player-card">
+        <img [src]="p.avatar || '/assets/avatar1.png'" alt="{{ p.playerName }}" />
+        <div>
+          <span class="player-name">{{ p.playerName }}</span>
+          <span class="player-score">{{ p.score }} נקודות</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- מסך סיום -->
+  <section *ngIf="isFinished" class="waiting-card finished-card">
+    <h2>🏆 החידון הסתיים!</h2>
+    <p>{{ statusMessage }}</p>
+    <div *ngIf="players.length > 0" class="final-leaderboard">
+      <h3>תוצאות סופיות:</h3>
+      <div *ngFor="let p of players; let i = index" class="final-row">
+        <span class="rank">{{ i + 1 }}</span>
+        <img [src]="p.avatar || '/assets/avatar1.png'" alt="{{ p.playerName }}" />
+        <span class="player-name">{{ p.playerName }}</span>
+        <span class="player-score">{{ p.score }} נקודות</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- מסך המתנה/טעינה -->
+  <section *ngIf="!currentQuestion && !isFinished" class="waiting-card">
+    <h2>היי {{ player?.playerName || player?.displayName || 'שחקן' }}! 👋</h2>
+    <p>{{ statusMessage || 'ממתינים לטעינת השאלה הבאה...' }}</p>
+    <div class="loader"></div>
+  </section>
+
+  <!-- מסך שאלה -->
+  <section *ngIf="currentQuestion && !isFinished" class="question-card">
+    <div class="question-header">
+      <div>
+        <!-- FIX: תוקן מ-currentQuestion.text ל-currentQuestion.questionText -->
+        <span class="level-chip" *ngIf="currentQuestion.difficulty">רמת קושי: {{ currentQuestion.difficulty }}</span>
+        <h3>{{ currentQuestion.questionText }}</h3>
+      </div>
+      <span class="timer" [class.timer-urgent]="timeLeft <= 3">{{ timeLeft }} שניות</span>
+    </div>
+
+    <div class="answers-grid">
+      <!-- FIX: הוספת [disabled]="isAnswering" למניעת לחיצה כפולה -->
+      <button
+        *ngFor="let ans of shuffledAnswers"
+        class="answer-btn"
+        [disabled]="isAnswering"
+        (click)="onAnswer(ans)">
+        {{ ans }}
+      </button>
+    </div>
+
+    <div class="question-footer">
+      <span>נקודות לשאלה: {{ currentQuestion.points }}</span>
+      <span class="small-text">{{ statusMessage }}</span>
+    </div>
+  </section>
+</div>
