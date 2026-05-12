@@ -1,4 +1,4 @@
-package com.example.demo.entity;
+package com.example.demo.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 public class Quiz {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quiz_seq")
+    @SequenceGenerator(name = "quiz_seq", sequenceName = "quiz_seq", allocationSize = 1)
     private Long id;
 
     private String name;

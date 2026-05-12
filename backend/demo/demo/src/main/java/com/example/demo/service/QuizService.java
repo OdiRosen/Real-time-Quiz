@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.Quiz;
+import com.example.demo.model.Quiz;
 import com.example.demo.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,11 @@ public class QuizService {
 
     public List<Quiz> getQuizzesByEmail(String email){
         return quizRepository.findByCreatorEmail(email);
+    }
+
+    public Quiz getQuizById (Long id){
+        return quizRepository.findById(id)
+                .orElseThrow(()->new RuntimeException("Quiz not found😶"));
     }
 
     public Quiz updateQuiz(Long id, Quiz updatedQuiz){
