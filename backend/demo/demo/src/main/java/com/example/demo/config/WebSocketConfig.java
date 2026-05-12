@@ -18,6 +18,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry){
-        registry.addEndpoint("ws-quiz").withSockJS();
+        // שימי לב: שינינו את שם ה-Endpoint ל-"ws" כדי שיתאים לאנגולר
+        // והוספנו setAllowedOriginPatterns כדי למנוע את שגיאת ה-Connection Failed
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }

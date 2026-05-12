@@ -670,3 +670,81 @@ button:hover {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* ודאי שהקלאס הזה קיים */
+.avatar-initials {
+  width: 48px;  /* חשוב מאוד! */
+  height: 48px; /* חשוב מאוד! */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.user-avatar, .nav-avatar-initials {
+  width: 32px; /* גודל קטן שמתאים ל-Navbar */
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.nav-avatar-initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-panel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.custom-profile input, .emoji-select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+}
+
+.emoji-select {
+  cursor: pointer;
+  background: white;
+}
+
+/* עיצוב לאימוג'י כשהוא מופיע כפרופיל */
+.emoji-avatar {
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.player-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.custom-profile input, .emoji-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: white;
+  font-size: 1rem;
+}
+
+/* מניעת הופעת חיצים בתיבת מספר (קוד חידון) */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}

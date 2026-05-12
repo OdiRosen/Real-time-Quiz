@@ -63,12 +63,13 @@ public class QuizService {
     /**
      * שמירת זוכה בלבד — ללא בדיקת זמן, תמיד מותר
      */
-    public Quiz saveWinner(Long id, String winnerName, Integer winnerScore) {
+    public Quiz saveWinner(Long id, String name, Integer score) {
         Quiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        quiz.setWinnerName(winnerName);
-        quiz.setWinnerScore(winnerScore);
+        // כאן את מעדכנת את השדות ב-DB
+        quiz.setWinnerName(name);
+        quiz.setWinnerScore(score);
         return quizRepository.save(quiz);
     }
 }

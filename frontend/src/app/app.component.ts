@@ -73,6 +73,9 @@ export class AppComponent implements OnInit {
   selectedQuiz: QuizInfo | null = null;
   message = '';
   isLoadingQuizzes = false;
+customDisplayName: string = '';
+selectedEmoji: string = 'default';
+
 
   // ללא id — ה-DB מייצר אוטומטית
   newQuiz = { title: '', start: '', end: '' };
@@ -292,68 +295,77 @@ export class AppComponent implements OnInit {
     this.quizzes = [];
   }
 
-  onPlayerJoin() {
-    const quizId = Number(this.quizCode);
-    if (!quizId) {
-      this.playerMessage = 'יש להזין קוד חידון תקין.';
-      return;
+  getAvatarColor(name: string): string {
+    if (!name) return '#ccc';
+    const colors = [
+      '#2196F3', '#F44336', '#FF9800', 
+      '#4CAF50', '#9C27B0', '#00BCD4', 
+      '#3F51B5', '#E91E63'
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    if (!this.playerName.trim()) {
-      this.playerMessage = 'אנא הזן שם תצוגה לפני ההצטרפות.';
-      return;
+    const index = Math.abs(hash % colors.length);
+    return colors[index];
+  }
+
+onPlayerJoin() {
+  if (!this.quizCode) {
+    this.playerMessage = 'יש להזין קוד חידון.';
+    return;
+  }
+  const quizId = Number(this.quizCode);
+  const finalName = this.customDisplayName.trim() || this.currentUser?.name || 'שחקן';
+  const finalAvatar = this.selectedEmoji !== 'default' ? this.selectedEmoji : (this.currentUser?.photoUrl || '');
+
+  this.selectedQuizId = quizId;
+  this.playerMessage = 'מצטרף לחידון...';
+
+  // שימוש ב-this.playerService (ולא ב-subscribe)
+  this.playerService.joinQuiz(quizId, finalName, finalAvatar).subscribe({
+    next: (player: any) => { // הוספנו : any כאן
+      this.playerData = {
+        ...player,
+        playerName: finalName,
+        avatar: finalAvatar
+      };
+      this.isJoined = true;
+      this.playerMessage = '';
+
+      // קריטי: הפעלת ההאזנה ל-WebSocket מיד אחרי ההצטרפות
+      this.playerService.getLeaderboardUpdates(quizId);
+    },
+    error: (err: any) => { // הוספנו : any כאן
+      console.error(err);
+      this.playerMessage = err.status === 403 ? 'החידון סגור.' : 'שגיאה בהצטרפות.';
     }
+  });
+}
+// פונקציה לבחירת חידון מהרשימה לצורך עריכה
+selectQuiz(quiz: any) {
+  this.selectedQuiz = { ...quiz }; // שומר עותק של החידון לעריכה
+  // כאן אפשר להוסיף לוגיקה שתפתח מודל או תעבור למסך עריכה
+  console.log('עורך את חידון:', quiz.id);
+}
 
-    this.selectedQuizId = quizId;
-    this.playerMessage = 'מצטרף לחידון...';
+// פונקציה לשמירת העדכונים של החידון
+saveQuizUpdate() {
+  if (!this.selectedQuiz) return;
 
-    const avatarUrl = this.currentUser?.photoUrl || this.defaultAvatar;
-    this.playerService.joinQuiz(quizId, this.playerName, avatarUrl).subscribe({
-      next: (player) => {
-        this.playerData = {
-          ...player,
-          playerName: this.playerName,
-          avatar: avatarUrl
-        };
-        this.isJoined = true;
-        this.playerMessage = '';
+  this.http.put(`http://localhost:8080/api/quizzes/${this.selectedQuiz.id}`, this.selectedQuiz)
+    .subscribe({
+      next: (updatedQuiz) => {
+        alert('החידון עודכן בהצלחה!');
+        this.selectedQuiz = null; // סוגר את מצב העריכה
+        // כאן כדאי לקרוא שוב לפונקציה שטוענת את כל החידונים כדי לרענן את הרשימה
       },
       error: (err) => {
-        if (err.status === 403) {
-          this.playerMessage = 'החידון סגור או שפג זמן ההצטרפות. נסה קוד אחר.';
-        } else if (err.status === 0) {
-          this.playerMessage = 'השרת לא זמין. בדוק שהשרת פועל.';
-        } else {
-          this.playerMessage = 'שגיאה בהצטרפות. בדוק את הקוד ונסה שוב.';
-        }
+        console.error('שגיאה בעדכון החידון:', err);
+        alert('חלה שגיאה בעדכון.');
       }
     });
-  }
-
-  selectQuiz(quiz: QuizInfo) {
-    this.selectedQuiz = { ...quiz };
-  }
-
-  saveQuizUpdate() {
-    if (!this.selectedQuiz) {
-      this.message = 'בחר חידון מהרשימה כדי לערוך אותו.';
-      return;
-    }
-
-    this.quizService.updateQuiz(this.selectedQuiz.id, {
-      name: this.selectedQuiz.title,
-      startTime: this.selectedQuiz.start,
-      endTime: this.selectedQuiz.end,
-      creatorEmail: this.selectedQuiz.owner
-    }).subscribe({
-      next: () => {
-        this.message = `החידון "${this.selectedQuiz!.title}" עודכן בהצלחה.`;
-        this.loadQuizzesFromDB();
-      },
-      error: () => {
-        this.message = 'שגיאה בעדכון החידון. בדוק שהשרת פועל.';
-      }
-    });
-  }
+}
 
   createNewQuiz() {
     if (!this.newQuiz.title.trim() || !this.newQuiz.start || !this.newQuiz.end) {

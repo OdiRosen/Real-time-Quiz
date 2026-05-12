@@ -25,6 +25,11 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   isAnswering = false;
   private initialized = false;
 
+  // הודעות הצטרפות
+  joinNotifications: { playerName: string; avatar: string }[] = [];
+  // שמירת שמות השחקנים הקודמים לזיהוי שחקן חדש
+  private previousPlayerNames = new Set<string>();
+
   timeLeft = 10;
   maxTime = 10;
   timerInterval: any = null;
@@ -187,30 +192,60 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
     this.leaderboardSub = this.playerService.getLeaderboardUpdates(this.quizId)
       .subscribe({
         next: (data: any[]) => {
-          if (Array.isArray(data)) {
-            const uniquePlayers = new Map<string, any>();
-            data.forEach((item: any) => {
-              const playerName = (item.displayName || item.name || 'שחקן').trim();
-              const key = playerName.toLowerCase();
-              const score = item.score ?? 0;
-              const existing = uniquePlayers.get(key);
-              if (!existing || score > existing.score) {
-                uniquePlayers.set(key, {
-                  playerName,
-                  avatar: item.image || 'assets/avatar1.png',
-                  score
-                });
+          if (!Array.isArray(data)) return;
+
+          // זיהוי שחקנים חדשים והצגת notification
+          data.forEach(item => {
+            const name = (item.displayName || item.name || 'שחקן').trim();
+            if (!this.previousPlayerNames.has(name)) {
+              this.previousPlayerNames.add(name);
+              // לא מציגים notification לשחקן הראשון (זה אני)
+              if (this.previousPlayerNames.size > 1) {
+                this.showJoinNotification(name, item.image || '');
               }
-            });
-            this.players = Array.from(uniquePlayers.values());
-            this.cdr.detectChanges();
-          }
+            }
+          });
+
+          // עדכון רשימת שחקנים עם סטטוס תשובה מהשרת
+          this.players = data.map(p => ({
+            playerName: (p.displayName || p.name || 'שחקן').trim(),
+            avatar: p.image || '',
+            score: p.score ?? 0,
+            hasAnswered: p.hasAnswered || false,
+            answerStatus: p.lastAnswerStatus || 'none'
+          })).sort((a, b) => b.score - a.score);
+
+          this.cdr.detectChanges();
         },
         error: (err: any) => console.error('Leaderboard update failed', err)
       });
   }
 
-  // FIX: שימוש ב-saveWinner במקום updateQuiz — לא מוגבל בזמן
+  // הצגת toast של שחקן חדש ל-3 שניות
+  showJoinNotification(playerName: string, avatar: string) {
+    const notification = { playerName, avatar };
+    this.joinNotifications.push(notification);
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      const idx = this.joinNotifications.indexOf(notification);
+      if (idx !== -1) this.joinNotifications.splice(idx, 1);
+      this.cdr.detectChanges();
+    }, 3000);
+  }
+
+  // צבע אוואטר אקראי לפי שם
+  getAvatarColor(name: string | undefined): string {
+    if (!name) return '#7b1fa2';
+    const colors = ['#f44336','#e91e63','#9c27b0','#673ab7',
+                    '#3f51b5','#2196f3','#00bcd4','#009688','#4caf50','#ff9800'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash % colors.length)];
+  }
+
   saveFinalWinner() {
     if (this.players.length > 0) {
       const winner = this.players[0];

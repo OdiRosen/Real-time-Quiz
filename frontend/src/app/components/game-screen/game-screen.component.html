@@ -1,11 +1,33 @@
 <div class="game-container">
 
-  <!-- פס שחקנים עליון — מוצג תמיד בזמן המשחק -->
+  <!-- ===== פס שחקנים עליון ===== -->
   <section class="players-panel" *ngIf="!isFinished">
     <div class="players-strip">
-      <div *ngFor="let p of players" class="player-card">
-        <img [src]="p.avatar || '/assets/avatar1.png'" alt="{{ p.playerName }}" />
-        <div>
+      <div
+        *ngFor="let p of players"
+        class="player-card"
+        [class.correct-anim]="p.answerStatus === 'correct'"
+        [class.wrong-anim]="p.answerStatus === 'wrong'">
+
+        <!-- תמונת פרופיל או ראשית שם -->
+        <div class="player-avatar-wrap">
+          <img
+            *ngIf="p.avatar && p.avatar.startsWith('http')"
+            [src]="p.avatar"
+            class="player-img" />
+          <div
+            *ngIf="!p.avatar || !p.avatar.startsWith('http')"
+            class="player-initials"
+            [style.background-color]="getAvatarColor(p.playerName)">
+            {{ (p.playerName || 'U').slice(0, 1).toUpperCase() }}
+          </div>
+
+          <!-- בדג סטטוס תשובה -->
+          <div *ngIf="p.answerStatus === 'correct'" class="status-badge correct">✓</div>
+          <div *ngIf="p.answerStatus === 'wrong'"   class="status-badge wrong">✗</div>
+        </div>
+
+        <div class="player-info">
           <span class="player-name">{{ p.playerName }}</span>
           <span class="player-score">{{ p.score }} נקודות</span>
         </div>
@@ -13,7 +35,7 @@
     </div>
   </section>
 
-  <!-- מסך סיום — 3 מנצחים בלבד -->
+  <!-- ===== מסך סיום — פודיום 3 מנצחים ===== -->
   <section *ngIf="isFinished" class="finished-card">
     <div class="finish-header">
       <h2>🏆 החידון הסתיים!</h2>
@@ -21,47 +43,51 @@
     </div>
 
     <div *ngIf="players.length > 0" class="podium-wrapper">
-
-      <!-- מקום ראשון -->
       <div class="podium-card gold" *ngIf="players[0]">
         <div class="medal">🥇</div>
-        <img [src]="players[0].avatar || '/assets/avatar1.png'" alt="{{ players[0].playerName }}" />
+        <img *ngIf="players[0].avatar?.startsWith('http')" [src]="players[0].avatar" />
+        <div *ngIf="!players[0].avatar?.startsWith('http')" class="podium-initials" [style.background-color]="getAvatarColor(players[0].playerName)">
+          {{ (players[0].playerName || 'U').slice(0,1).toUpperCase() }}
+        </div>
         <span class="podium-name">{{ players[0].playerName }}</span>
         <span class="podium-score">{{ players[0].score }} נקודות</span>
         <div class="podium-block gold-block">1</div>
       </div>
 
-      <!-- מקום שני -->
       <div class="podium-card silver" *ngIf="players[1]">
         <div class="medal">🥈</div>
-        <img [src]="players[1].avatar || '/assets/avatar1.png'" alt="{{ players[1].playerName }}" />
+        <img *ngIf="players[1].avatar?.startsWith('http')" [src]="players[1].avatar" />
+        <div *ngIf="!players[1].avatar?.startsWith('http')" class="podium-initials" [style.background-color]="getAvatarColor(players[1].playerName)">
+          {{ (players[1].playerName || 'U').slice(0,1).toUpperCase() }}
+        </div>
         <span class="podium-name">{{ players[1].playerName }}</span>
         <span class="podium-score">{{ players[1].score }} נקודות</span>
         <div class="podium-block silver-block">2</div>
       </div>
 
-      <!-- מקום שלישי -->
       <div class="podium-card bronze" *ngIf="players[2]">
         <div class="medal">🥉</div>
-        <img [src]="players[2].avatar || '/assets/avatar1.png'" alt="{{ players[2].playerName }}" />
+        <img *ngIf="players[2].avatar?.startsWith('http')" [src]="players[2].avatar" />
+        <div *ngIf="!players[2].avatar?.startsWith('http')" class="podium-initials" [style.background-color]="getAvatarColor(players[2].playerName)">
+          {{ (players[2].playerName || 'U').slice(0,1).toUpperCase() }}
+        </div>
         <span class="podium-name">{{ players[2].playerName }}</span>
         <span class="podium-score">{{ players[2].score }} נקודות</span>
         <div class="podium-block bronze-block">3</div>
       </div>
-
     </div>
 
     <div *ngIf="players.length === 0" class="hint">אין נתוני שחקנים להצגה.</div>
   </section>
 
-  <!-- מסך המתנה/טעינה -->
+  <!-- ===== מסך המתנה/טעינה ===== -->
   <section *ngIf="!currentQuestion && !isFinished" class="waiting-card">
     <h2>היי {{ player?.playerName || player?.displayName || 'שחקן' }}! 👋</h2>
     <p>{{ statusMessage || 'ממתינים לטעינת השאלה הבאה...' }}</p>
     <div class="loader"></div>
   </section>
 
-  <!-- מסך שאלה -->
+  <!-- ===== מסך שאלה ===== -->
   <section *ngIf="currentQuestion && !isFinished" class="question-card">
     <div class="question-header">
       <div>
@@ -86,5 +112,18 @@
       <span class="small-text">{{ statusMessage }}</span>
     </div>
   </section>
+
+  <!-- ===== Toast הצטרפות שחקן חדש ===== -->
+  <div class="notifications-container">
+    <div *ngFor="let note of joinNotifications" class="join-toast">
+      <div class="toast-avatar"
+           *ngIf="!note.avatar?.startsWith('http')"
+           [style.background-color]="getAvatarColor(note.playerName)">
+        {{ (note.playerName || 'U').slice(0,1).toUpperCase() }}
+      </div>
+      <img *ngIf="note.avatar?.startsWith('http')" [src]="note.avatar" class="toast-img" />
+      <span><strong>{{ note.playerName }}</strong> הצטרף למשחק! 👋</span>
+    </div>
+  </div>
 
 </div>

@@ -8,7 +8,9 @@ import com.example.demo.repository.QuizRepository;
 import com.example.demo.repository.QuestionRepository;
 import com.example.demo.repository.WinnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate; // ייבוא חיוני לפתרון השגיאה
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +30,9 @@ public class PlayerService {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate; // הזרקה חיונית לפתרון השגיאה
+
     private final Map<Long, Map<String, Player>> activePlayers = new ConcurrentHashMap<>();
     private final Map<String, List<Question>> playerPersonalQuestions = new ConcurrentHashMap<>();
     private final Map<String, LocalDateTime> questionStartTimes = new ConcurrentHashMap<>();
@@ -36,9 +41,19 @@ public class PlayerService {
         Quiz quiz = quizRepository.findById(quizId)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(quiz.getEndTime())) {
+        if (LocalDateTime.now().isAfter(quiz.getEndTime())) {
             throw new RuntimeException("החידון הסתיים, לא ניתן להצטרף.");
+        }
+
+        // בדיקה אם השם כבר קיים כדי למנוע כפילויות
+        Map<String, Player> playersInQuiz = activePlayers.computeIfAbsent(quizId, k -> new ConcurrentHashMap<>());
+        Optional<Player> existing = playersInQuiz.values().stream()
+                .filter(p -> p.getDisplayName().equalsIgnoreCase(displayName))
+                .findFirst();
+
+        if (existing.isPresent()) {
+            broadcastLeaderboard(quizId);
+            return existing.get();
         }
 
         Player newPlayer = new Player();
@@ -48,6 +63,8 @@ public class PlayerService {
         newPlayer.setScore(0);
         newPlayer.setCurrentQuestionIndex(0);
         newPlayer.setTotalTimeTaken(0L);
+        newPlayer.setHasAnswered(false);
+        newPlayer.setLastAnswerStatus("none");
 
         List<Question> questions = new ArrayList<>(questionRepository.findByQuizId(quizId));
         if (questions.isEmpty()) {
@@ -56,13 +73,31 @@ public class PlayerService {
         Collections.shuffle(questions);
         playerPersonalQuestions.put(newPlayer.getPlayerId(), questions);
 
-        activePlayers.computeIfAbsent(quizId, k -> new ConcurrentHashMap<>())
-                .put(newPlayer.getPlayerId(), newPlayer);
-
-        // אתחול טיימר לשאלה הראשונה
+        playersInQuiz.put(newPlayer.getPlayerId(), newPlayer);
         questionStartTimes.put(newPlayer.getPlayerId(), LocalDateTime.now());
 
+        System.out.println("שחקן " + displayName + " הצטרף לחידון " + quizId);
+
+        // עדכון כל המחוברים שמישהו נכנס
+        broadcastLeaderboard(quizId);
+
         return newPlayer;
+    }
+
+    public void removePlayer(Long quizId, String playerId) {
+        Map<String, Player> playersInQuiz = activePlayers.get(quizId);
+        if (playersInQuiz != null) {
+            playersInQuiz.remove(playerId);
+            System.out.println("שחקן הוסר מהמערכת: " + playerId);
+            // עדכון כל המחוברים שמישהו יצא
+            broadcastLeaderboard(quizId);
+        }
+    }
+
+    private void broadcastLeaderboard(Long quizId) {
+        List<Player> sortedPlayers = getActivePlayersSorted(quizId);
+        // שליחת הרשימה המעודכנת לנתיב שהאנגולר מקשיב לו
+        messagingTemplate.convertAndSend("/topic/quiz/" + quizId, sortedPlayers);
     }
 
     public Question getSyncQuestion(Long quizId, String playerId) {
@@ -74,9 +109,8 @@ public class PlayerService {
             return null;
         }
 
-        // תיקון הטיימר: מאפסים את הזמן ברגע שהשחקן "מושך" את השאלה החדשה מהשרת
-        questionStartTimes.put(playerId, LocalDateTime.now());
-
+        player.setHasAnswered(false);
+        player.setLastAnswerStatus("none");
         return personalList.get(currentIndex);
     }
 
@@ -94,13 +128,14 @@ public class PlayerService {
         LocalDateTime startTime = questionStartTimes.getOrDefault(playerId, LocalDateTime.now());
         long secondsElapsed = java.time.Duration.between(startTime, LocalDateTime.now()).getSeconds();
 
-        if ("TIMEOUT".equals(submittedAnswer) || secondsElapsed > SECONDS_PER_QUESTION) {
-            response.put("status", "timeout");
-            response.put("correct", false);
-        } else {
-            boolean isCorrect = currentQuestion.getAnswer1().trim()
-                    .equalsIgnoreCase(submittedAnswer.trim());
+        player.setHasAnswered(true);
 
+        if ("TIMEOUT".equals(submittedAnswer) || secondsElapsed > SECONDS_PER_QUESTION) {
+            player.setLastAnswerStatus("wrong");
+            response.put("status", "timeout");
+        } else {
+            boolean isCorrect = currentQuestion.getAnswer1().trim().equalsIgnoreCase(submittedAnswer.trim());
+            player.setLastAnswerStatus(isCorrect ? "correct" : "wrong");
             if (isCorrect) {
                 long bonus = Math.max(0, SECONDS_PER_QUESTION - secondsElapsed);
                 player.setScore(player.getScore() + currentQuestion.getPoints() + (int) bonus);
@@ -109,51 +144,18 @@ public class PlayerService {
             response.put("correct", isCorrect);
         }
 
-        // עדכון זמן מצטבר וקידום אינדקס
         player.setTotalTimeTaken(player.getTotalTimeTaken() + secondsElapsed);
         player.setCurrentQuestionIndex(player.getCurrentQuestionIndex() + 1);
-        response.put("score", player.getScore());
+        questionStartTimes.put(playerId, LocalDateTime.now());
 
-        // בדיקה האם יש מנצח חדש אחרי כל תשובה
-        updateWinnerIfNecessary(quizId, player);
+        // עדכון טבלת המובילים אחרי כל תשובה
+        broadcastLeaderboard(quizId);
 
         return response;
     }
 
-    public void updateWinnerIfNecessary(Long quizId, Player currentPlayer) {
-        // תיקון: משתמשים ב-winnerRepository שהזרקנו למעלה, לא מגדירים אותו מחדש בתוך הפונקציה
-        QuizWinner currentWinner = (QuizWinner) winnerRepository.findById(quizId).orElse(null);
-
-        long currentPlayerTime = currentPlayer.getTotalTimeTaken();
-        int currentPlayerScore = currentPlayer.getScore();
-
-        boolean isNewWinner = false;
-
-        if (currentWinner == null) {
-            isNewWinner = true;
-        } else if (currentPlayerScore > currentWinner.getScore()) {
-            isNewWinner = true;
-        } else if (currentPlayerScore == currentWinner.getScore() &&
-                currentPlayerTime < currentWinner.getTotalTimeMillis()) {
-            isNewWinner = true;
-        }
-
-        if (isNewWinner) {
-            QuizWinner newWinner = new QuizWinner();
-            newWinner.setQuizId(quizId);
-            newWinner.setPlayerName(currentPlayer.getDisplayName());
-            newWinner.setScore(currentPlayerScore);
-            newWinner.setTotalTimeMillis(currentPlayerTime);
-
-            winnerRepository.save(newWinner);
-        }
-    }
-
     public List<Player> getActivePlayersSorted(Long quizId) {
-        // שליפת המפה של השחקנים עבור החידון הספציפי
         Map<String, Player> playersInQuiz = activePlayers.getOrDefault(quizId, new HashMap<>());
-
-        // מיון: קודם לפי ניקוד גבוה, ואז לפי זמן כולל נמוך (שובר שוויון)
         return playersInQuiz.values().stream()
                 .sorted(Comparator.comparingInt(Player::getScore).reversed()
                         .thenComparingLong(Player::getTotalTimeTaken))

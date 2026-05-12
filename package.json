@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@abacritt/angularx-social-login": "^2.6.0"
+    "@abacritt/angularx-social-login": "^2.6.0",
+    "@stomp/stompjs": "^7.3.0"
   }
 }
