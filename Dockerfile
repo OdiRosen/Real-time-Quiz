@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN mvn -f backend\demo\demo\pom.xml clean package -DskipTests
+RUN mvn -f backend/demo/demo/pom.xml clean package -DskipTests
 
 FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
