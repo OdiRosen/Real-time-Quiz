@@ -9,20 +9,13 @@
         [class.correct-anim]="p.answerStatus === 'correct'"
         [class.wrong-anim]="p.answerStatus === 'wrong'">
 
-        <!-- תמונת פרופיל או ראשית שם -->
         <div class="player-avatar-wrap">
-          <img
-            *ngIf="p.avatar && p.avatar.startsWith('http')"
-            [src]="p.avatar"
-            class="player-img" />
-          <div
-            *ngIf="!p.avatar || !p.avatar.startsWith('http')"
-            class="player-initials"
-            [style.background-color]="getAvatarColor(p.playerName)">
-            {{ (p.playerName || 'U').slice(0, 1).toUpperCase() }}
+          <img *ngIf="p.avatar && p.avatar.startsWith('http')" [src]="p.avatar" class="player-img" />
+          <div *ngIf="!p.avatar || !p.avatar.startsWith('http')"
+               class="player-initials"
+               [style.background-color]="getAvatarColor(p.playerName)">
+            {{ (p.playerName || 'U').slice(0,1).toUpperCase() }}
           </div>
-
-          <!-- בדג סטטוס תשובה -->
           <div *ngIf="p.answerStatus === 'correct'" class="status-badge correct">✓</div>
           <div *ngIf="p.answerStatus === 'wrong'"   class="status-badge wrong">✗</div>
         </div>
@@ -46,7 +39,8 @@
       <div class="podium-card gold" *ngIf="players[0]">
         <div class="medal">🥇</div>
         <img *ngIf="players[0].avatar?.startsWith('http')" [src]="players[0].avatar" />
-        <div *ngIf="!players[0].avatar?.startsWith('http')" class="podium-initials" [style.background-color]="getAvatarColor(players[0].playerName)">
+        <div *ngIf="!players[0].avatar?.startsWith('http')" class="podium-initials"
+             [style.background-color]="getAvatarColor(players[0].playerName)">
           {{ (players[0].playerName || 'U').slice(0,1).toUpperCase() }}
         </div>
         <span class="podium-name">{{ players[0].playerName }}</span>
@@ -57,7 +51,8 @@
       <div class="podium-card silver" *ngIf="players[1]">
         <div class="medal">🥈</div>
         <img *ngIf="players[1].avatar?.startsWith('http')" [src]="players[1].avatar" />
-        <div *ngIf="!players[1].avatar?.startsWith('http')" class="podium-initials" [style.background-color]="getAvatarColor(players[1].playerName)">
+        <div *ngIf="!players[1].avatar?.startsWith('http')" class="podium-initials"
+             [style.background-color]="getAvatarColor(players[1].playerName)">
           {{ (players[1].playerName || 'U').slice(0,1).toUpperCase() }}
         </div>
         <span class="podium-name">{{ players[1].playerName }}</span>
@@ -68,7 +63,8 @@
       <div class="podium-card bronze" *ngIf="players[2]">
         <div class="medal">🥉</div>
         <img *ngIf="players[2].avatar?.startsWith('http')" [src]="players[2].avatar" />
-        <div *ngIf="!players[2].avatar?.startsWith('http')" class="podium-initials" [style.background-color]="getAvatarColor(players[2].playerName)">
+        <div *ngIf="!players[2].avatar?.startsWith('http')" class="podium-initials"
+             [style.background-color]="getAvatarColor(players[2].playerName)">
           {{ (players[2].playerName || 'U').slice(0,1).toUpperCase() }}
         </div>
         <span class="podium-name">{{ players[2].playerName }}</span>
@@ -113,16 +109,26 @@
     </div>
   </section>
 
-  <!-- ===== Toast הצטרפות שחקן חדש ===== -->
+  <!-- ===== Toasts כניסה/יציאה ===== -->
   <div class="notifications-container">
-    <div *ngFor="let note of joinNotifications" class="join-toast">
+    <div *ngFor="let note of notifications"
+         class="notification-toast"
+         [class.toast-join]="note.type === 'join'"
+         [class.toast-leave]="note.type === 'leave'">
+
       <div class="toast-avatar"
            *ngIf="!note.avatar?.startsWith('http')"
            [style.background-color]="getAvatarColor(note.playerName)">
         {{ (note.playerName || 'U').slice(0,1).toUpperCase() }}
       </div>
       <img *ngIf="note.avatar?.startsWith('http')" [src]="note.avatar" class="toast-img" />
-      <span><strong>{{ note.playerName }}</strong> הצטרף למשחק! 👋</span>
+
+      <span *ngIf="note.type === 'join'">
+        <strong>{{ note.playerName }}</strong> הצטרף למשחק! 👋
+      </span>
+      <span *ngIf="note.type === 'leave'">
+        <strong>{{ note.playerName }}</strong> עזב את המשחק 👋
+      </span>
     </div>
   </div>
 

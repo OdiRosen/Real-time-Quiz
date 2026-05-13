@@ -1,234 +1,438 @@
-.game-container {
-    display: grid;
-    gap: 24px;
-    color: #102a43;
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+/* ============================================================
+   GAME SCREEN — CYBER DARK THEME
+   ============================================================ */
+:root {
+  --bg-void:       #020510;
+  --bg-card:       rgba(11, 22, 41, 0.75);
+  --bg-elevated:   rgba(16, 30, 58, 0.88);
+
+  --accent-blue:   #3b7bff;
+  --accent-cyan:   #00e5ff;
+  --accent-green:  #00ffa3;
+  --accent-red:    #ff4466;
+  --accent-amber:  #ffb800;
+
+  --glow-blue:     0 0 24px rgba(59, 123, 255, 0.5);
+  --glow-cyan:     0 0 24px rgba(0, 229, 255, 0.4);
+  --glow-green:    0 0 20px rgba(0, 255, 163, 0.45);
+  --glow-red:      0 0 20px rgba(255, 68, 102, 0.4);
+
+  --border-dim:    rgba(59, 123, 255, 0.1);
+  --border-mid:    rgba(59, 123, 255, 0.25);
+  --border-bright: rgba(0, 229, 255, 0.5);
+
+  --text-primary:  #e8f0ff;
+  --text-secondary:#7a91b8;
+  --text-muted:    #3d5070;
+
+  --radius-sm:  12px;
+  --radius-md:  20px;
+  --radius-lg:  28px;
+  --radius-full: 9999px;
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --transition:   0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ===== פס שחקנים ===== */
+/* ============================================================
+   CONTAINER
+   ============================================================ */
+.game-container {
+  display: grid;
+  gap: 20px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  direction: rtl;
+}
+
+/* ============================================================
+   PLAYERS PANEL
+   ============================================================ */
 .players-panel {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    border-radius: 26px;
-    padding: 18px;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.04), 0 20px 60px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.players-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  opacity: 0.5;
 }
 
 .players-strip {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* כרטיס שחקן */
+/* ============================================================
+   PLAYER CARD
+   ============================================================ */
 .player-card {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 20px;
-    background: #fff;
-    border: 2px solid #e2e8f0;
-    min-width: 160px;
-    position: relative;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* אנימציית כניסה לשחקן חדש */
-.player-card {
-    animation: cardEnter 0.5s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border-dim);
+  min-width: 155px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardEnter 0.5s ease-out;
 }
 
 @keyframes cardEnter {
-    from { opacity: 0; transform: scale(0.7) translateY(-10px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
+  from { opacity: 0; transform: scale(0.7) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
 }
 
-/* תשובה נכונה — ירוק */
+/* Correct answer — cyan glow */
 .player-card.correct-anim {
-    border-color: #22c55e;
-    background: rgba(34, 197, 94, 0.08);
-    box-shadow: 0 0 18px rgba(34, 197, 94, 0.35);
-    animation: correctPulse 0.6s ease;
+  border-color: var(--accent-green);
+  background: rgba(0,255,163,0.07);
+  box-shadow: 0 0 0 1px var(--accent-green), var(--glow-green);
+  animation: correctPulse 0.6s ease;
 }
 
 @keyframes correctPulse {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.06); }
-    100% { transform: scale(1); }
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
-/* תשובה שגויה — אדום */
+/* Wrong answer — red shake */
 .player-card.wrong-anim {
-    border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.07);
-    animation: wrongShake 0.4s ease;
+  border-color: var(--accent-red);
+  background: rgba(255,68,102,0.07);
+  box-shadow: var(--glow-red);
+  animation: wrongShake 0.4s ease;
 }
 
 @keyframes wrongShake {
-    0%, 100% { transform: translateX(0); }
-    25%       { transform: translateX(-5px); }
-    75%       { transform: translateX(5px); }
+  0%, 100% { transform: translateX(0); }
+  25%       { transform: translateX(-6px); }
+  75%       { transform: translateX(6px); }
 }
 
-/* עטיפת תמונת שחקן */
-.player-avatar-wrap {
-    position: relative;
-    flex-shrink: 0;
-}
+/* ============================================================
+   PLAYER AVATAR
+   ============================================================ */
+.player-avatar-wrap { position: relative; flex-shrink: 0; }
 
 .player-img {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    object-fit: cover;
-    border: 2px solid #cbd5e1;
+  width: 44px; height: 44px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  border: 2px solid var(--border-mid);
 }
 
 .player-initials {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: #fff;
+  width: 44px; height: 44px;
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #fff;
 }
 
-/* בדג סטטוס */
+/* Status badge */
 .status-badge {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 800;
-    color: #fff;
-    z-index: 2;
-    animation: badgePop 0.3s ease;
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800;
+  color: #fff; z-index: 2;
+  animation: badgePop 0.3s ease;
 }
 
 @keyframes badgePop {
-    from { transform: scale(0); }
-    to   { transform: scale(1); }
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
 }
 
-.status-badge.correct { background: #22c55e; }
-.status-badge.wrong   { background: #ef4444; }
+.status-badge.correct { background: var(--accent-green); box-shadow: var(--glow-green); }
+.status-badge.wrong   { background: var(--accent-red);   box-shadow: var(--glow-red); }
 
 .player-info { display: flex; flex-direction: column; }
 
 .player-name {
-    font-weight: 700;
-    color: #0f172a;
-    font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-display);
 }
 
 .player-score {
-    color: #475569;
-    font-size: 0.85rem;
+  color: var(--accent-cyan);
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
-/* ===== Toast הצטרפות ===== */
-.notifications-container {
-    position: fixed;
-    bottom: 24px;
-    left: 24px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    pointer-events: none;
+/* ============================================================
+   WAITING CARD
+   ============================================================ */
+.waiting-card, .question-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(24px);
+  padding: 32px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.04), 0 32px 80px rgba(0,0,0,0.5);
 }
 
-.join-toast {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    padding: 12px 18px;
-    border-radius: 50px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    border-right: 4px solid #22c55e;
-    font-size: 0.95rem;
-    color: #0f172a;
-    animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-               toastOut 0.3s ease 2.7s forwards;
+.waiting-card::before, .question-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 10%; right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+  opacity: 0.5;
 }
 
-.toast-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 0.9rem;
-    color: #fff;
-    flex-shrink: 0;
+.waiting-card h2, .question-card h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-.toast-img {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
+.waiting-card h2 {
+  font-size: 1.8rem;
+  color: var(--text-primary);
+  margin-bottom: 10px;
 }
 
-@keyframes toastIn {
-    from { transform: translateX(-120%); opacity: 0; }
-    to   { transform: translateX(0);     opacity: 1; }
+.waiting-card p { color: var(--text-secondary); font-size: 1rem; }
+
+/* ============================================================
+   QUESTION CARD
+   ============================================================ */
+.question-card { text-align: right; }
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-@keyframes toastOut {
-    from { transform: translateX(0);     opacity: 1; }
-    to   { transform: translateX(-120%); opacity: 0; }
+.level-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(0,229,255,0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0,229,255,0.2);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
-/* ===== מסך סיום — פודיום ===== */
+.question-card h3 {
+  margin: 10px 0 0;
+  font-size: 1.5rem;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   TIMER
+   ============================================================ */
+.timer {
+  min-width: 88px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-mid);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.timer.timer-urgent {
+  background: rgba(255,68,102,0.15);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  box-shadow: var(--glow-red);
+  animation: timerPulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes timerPulse {
+  from { transform: scale(1); }
+  to   { transform: scale(1.05); }
+}
+
+/* ============================================================
+   ANSWERS GRID
+   ============================================================ */
+.answers-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.answer-btn {
+  padding: 20px 16px;
+  font-size: 1rem;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-primary);
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.answer-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(59,123,255,0.12), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.answer-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.3), var(--glow-cyan);
+}
+
+.answer-btn:hover:not(:disabled)::before { opacity: 1; }
+
+.answer-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Cycle answer button accent colors */
+.answer-btn:nth-child(1) { --btn-accent: #3b7bff; }
+.answer-btn:nth-child(2) { --btn-accent: #00e5ff; }
+.answer-btn:nth-child(3) { --btn-accent: #7c3aed; }
+.answer-btn:nth-child(4) { --btn-accent: #00ffa3; }
+
+.answer-btn:nth-child(1):hover:not(:disabled) { border-color: #3b7bff; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(59,123,255,0.4); }
+.answer-btn:nth-child(2):hover:not(:disabled) { border-color: #00e5ff; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(0,229,255,0.4); }
+.answer-btn:nth-child(3):hover:not(:disabled) { border-color: #7c3aed; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(124,58,237,0.4); }
+.answer-btn:nth-child(4):hover:not(:disabled) { border-color: #00ffa3; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(0,255,163,0.4); }
+
+.question-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.small-text { color: var(--accent-cyan); font-weight: 700; }
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+.loader {
+  width: 44px; height: 44px;
+  border: 3px solid var(--border-mid);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 0.85s linear infinite;
+  margin: 24px auto 0;
+  box-shadow: 0 0 16px rgba(0,229,255,0.25);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   FINISHED CARD — PODIUM
+   ============================================================ */
 .finished-card {
-    background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 100%);
-    border-radius: 32px;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(160deg, #060c1a 0%, #0b1629 60%, #0d1f3c 100%);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 0 0 1px rgba(0,229,255,0.06), 0 40px 100px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
 }
+
+/* Decorative grid in background */
+.finished-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(59,123,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,123,255,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.finish-header { position: relative; z-index: 1; }
 
 .finish-header h2 {
-    font-size: 2.2rem;
-    color: #fbbf24;
-    margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--accent-amber);
+  margin: 0 0 8px;
+  text-shadow: 0 0 32px rgba(255,184,0,0.4);
+  letter-spacing: -0.02em;
 }
 
 .finish-subtitle {
-    color: #94a3b8;
-    margin-bottom: 2.5rem;
+  color: var(--text-secondary);
+  margin-bottom: 2.5rem;
+  font-size: 0.95rem;
 }
 
 .podium-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 20px;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
 }
 
 .podium-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    animation: podiumRise 0.7s ease both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: podiumRise 0.7s ease both;
 }
 
 .podium-card.gold   { animation-delay: 0.3s; }
@@ -236,174 +440,128 @@
 .podium-card.bronze { animation-delay: 0.2s; }
 
 @keyframes podiumRise {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .medal { font-size: 2rem; }
-.gold .medal { font-size: 2.5rem; }
+.gold .medal { font-size: 2.5rem; filter: drop-shadow(0 0 10px rgba(255,184,0,0.6)); }
 
-.podium-card img,
-.podium-initials {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid rgba(255,255,255,0.2);
+.podium-card img, .podium-initials {
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-mid);
 }
 
-.gold   img, .gold   .podium-initials { width: 88px; height: 88px; border-color: #fbbf24; box-shadow: 0 0 24px rgba(251,191,36,0.5); }
-.silver img, .silver .podium-initials { border-color: #cbd5e1; }
+.gold   img, .gold   .podium-initials {
+  width: 88px; height: 88px;
+  border-color: var(--accent-amber);
+  box-shadow: 0 0 32px rgba(255,184,0,0.5);
+}
+
+.silver img, .silver .podium-initials { border-color: #94a3b8; }
 .bronze img, .bronze .podium-initials { border-color: #d97706; }
 
 .podium-initials {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 1.5rem; color: #fff;
 }
 
-.podium-name  { font-weight: 800; font-size: 1rem;   color: #f1f5f9; }
-.podium-score { font-size: 0.88rem; color: #94a3b8; }
+.podium-name  { font-family: var(--font-display); font-weight: 800; font-size: 0.95rem; color: var(--text-primary); }
+.podium-score { font-size: 0.82rem; color: var(--accent-cyan); font-weight: 600; }
 
 .podium-block {
-    width: 90px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: #fff;
-    border-radius: 12px 12px 0 0;
-    margin-top: 8px;
+  width: 88px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1.4rem; font-weight: 900; color: #fff;
+  border-radius: 10px 10px 0 0;
+  margin-top: 8px;
 }
 
-.gold-block   { height: 90px; background: linear-gradient(180deg, #fbbf24, #d97706); }
-.silver-block { height: 65px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); }
-.bronze-block { height: 48px; background: linear-gradient(180deg, #fdba74, #c2410c); }
+.gold-block   { height: 88px; background: linear-gradient(180deg, #fbbf24, #d97706); box-shadow: 0 0 24px rgba(251,191,36,0.4); }
+.silver-block { height: 64px; background: linear-gradient(180deg, #cbd5e1, #64748b); }
+.bronze-block { height: 46px; background: linear-gradient(180deg, #fdba74, #92400e); }
 
-/* ===== מסך המתנה וטעינה ===== */
-.waiting-card,
-.question-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.95), #f8fafc);
-    border-radius: 28px;
-    border: 1px solid rgba(148,163,184,0.12);
-    box-shadow: 0 24px 60px rgba(15,23,42,0.08);
-    padding: 28px;
-    text-align: center;
+/* ============================================================
+   TOASTS / NOTIFICATIONS
+   ============================================================ */
+.notifications-container {
+  position: fixed;
+  bottom: 24px; left: 24px;
+  z-index: 1000;
+  display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none;
 }
 
-.question-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.8rem;
-    text-align: right;
+.notification-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(20px);
+  padding: 12px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-mid);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+             toastOut 0.3s ease 2.7s forwards;
 }
 
-.level-chip {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.45rem 0.85rem;
-    border-radius: 999px;
-    background: #e0f2fe;
-    color: #0369a1;
-    font-weight: 700;
-    font-size: 0.92rem;
+.toast-join  { border-right: 3px solid var(--accent-green); box-shadow: 0 8px 32px rgba(0,0,0,0.4), var(--glow-green); }
+.toast-leave { border-right: 3px solid #f97316; opacity: 0.88; }
+
+/* Legacy join-toast class support */
+.join-toast {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-elevated);
+  backdrop-filter: blur(20px);
+  padding: 12px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-mid);
+  border-right: 3px solid var(--accent-green);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), var(--glow-green);
+  font-size: 0.9rem; color: var(--text-primary); font-family: var(--font-body);
+  animation: toastIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+             toastOut 0.3s ease 2.7s forwards;
 }
 
-.question-card h3 {
-    margin: 0.7rem 0 0;
-    font-size: 1.65rem;
-    line-height: 1.3;
+.toast-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 0.85rem; color: #fff; flex-shrink: 0;
 }
 
-.timer {
-    min-width: 96px;
-    padding: 12px 16px;
-    border-radius: 18px;
-    background: #0f172a;
-    color: #fff;
-    font-weight: 700;
-    text-align: center;
-    white-space: nowrap;
-    transition: background 0.3s;
+.toast-img {
+  width: 30px; height: 30px;
+  border-radius: 50%; object-fit: cover; flex-shrink: 0;
 }
 
-.timer.timer-urgent {
-    background: #dc2626;
-    animation: timerPulse 0.5s ease-in-out infinite alternate;
+@keyframes toastIn {
+  from { transform: translateX(-120%); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
 }
 
-@keyframes timerPulse {
-    from { transform: scale(1); }
-    to   { transform: scale(1.06); }
+@keyframes toastOut {
+  from { transform: translateX(0);     opacity: 1; }
+  to   { transform: translateX(-120%); opacity: 0; }
 }
 
-.answers-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-    margin-top: 12px;
-}
-
-.answer-btn {
-    padding: 18px 16px;
-    font-size: 1.05rem;
-    border: 1px solid transparent;
-    border-radius: 18px;
-    background: #fff;
-    color: #0f172a;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    box-shadow: 0 10px 25px rgba(15,23,42,0.06);
-    width: 100%;
-}
-
-.answer-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    border-color: #93c5fd;
-}
-
-.answer-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.question-footer {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    color: #475569;
-    font-size: 0.96rem;
-}
-
-.small-text { color: #0f172a; font-weight: 700; }
-
-.loader {
-    width: 48px;
-    height: 48px;
-    border: 5px solid rgba(15,23,42,0.12);
-    border-top: 5px solid #0f172a;
-    border-radius: 50%;
-    animation: spin 0.9s linear infinite;
-    margin: 24px auto 0;
-}
-
-@keyframes spin {
-    0%   { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 @media (max-width: 660px) {
-    .answers-grid  { grid-template-columns: 1fr; }
-    .podium-wrapper { gap: 12px; }
-    .podium-block  { width: 70px; }
+  .answers-grid  { grid-template-columns: 1fr; }
+  .podium-wrapper { gap: 10px; }
+  .podium-block  { width: 68px; }
+  .gold-block    { height: 72px; }
+  .silver-block  { height: 52px; }
+  .bronze-block  { height: 38px; }
 }

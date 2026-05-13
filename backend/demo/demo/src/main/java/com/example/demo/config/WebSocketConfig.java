@@ -11,17 +11,18 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void configureMessageBroker(MessageBrokerRegistry config){
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        // הנתיבים שה-Angular מקשיב אליהם
         config.enableSimpleBroker("/topic");
+        // הנתיב שדרכו Angular שולח הודעות לשרת (לא בשימוש כרגע)
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry registry){
-        // שימי לב: שינינו את שם ה-Endpoint ל-"ws" כדי שיתאים לאנגולר
-        // והוספנו setAllowedOriginPatterns כדי למנוע את שגיאת ה-Connection Failed
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // נקודת החיבור — Angular מתחבר לכאן
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .withSockJS(); // SockJS כ-fallback לדפדפנים שלא תומכים ב-WebSocket
     }
 }

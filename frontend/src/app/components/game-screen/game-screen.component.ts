@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Input, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, Input, inject, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -25,9 +25,8 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   isAnswering = false;
   private initialized = false;
 
-  // הודעות הצטרפות
-  joinNotifications: { playerName: string; avatar: string }[] = [];
-  // שמירת שמות השחקנים הקודמים לזיהוי שחקן חדש
+  // הודעות כניסה/יציאה
+  notifications: { playerName: string; avatar: string; type: 'join' | 'leave' }[] = [];
   private previousPlayerNames = new Set<string>();
 
   timeLeft = 10;
@@ -39,6 +38,14 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   private quizService = inject(QuizService);
   private cdr = inject(ChangeDetectorRef);
 
+  // FIX: כשסוגרים טאב/דפדפן — מודיעים לשרת
+  @HostListener('window:beforeunload')
+  onBeforeUnload() {
+    if (this.playerId && this.quizId) {
+      this.playerService.leaveQuiz(this.quizId, this.playerId);
+    }
+  }
+
   ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -48,6 +55,10 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
     if (playerReady && quizReady && !this.initialized) {
       this.initialized = true;
       this.playerId = this.player.playerId || this.player.id || '';
+
+      // FIX: מתחברים ל-WebSocket לפני הכל
+      this.playerService.connectToQuiz(this.quizId);
+
       this.loadQuestionFromServer();
       this.subscribeLeaderboard();
     }
@@ -56,6 +67,10 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {
     this.leaderboardSub?.unsubscribe();
     this.clearTimer();
+    // ניתוק WebSocket בעת השמדת הקומפוננט
+    if (this.playerId && this.quizId) {
+      this.playerService.leaveQuiz(this.quizId, this.playerId);
+    }
   }
 
   private clearTimer() {
@@ -88,10 +103,8 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
         const question = response.body;
         this.currentQuestion = question;
         this.shuffledAnswers = [
-          question.answer1,
-          question.answer2,
-          question.answer3,
-          question.answer4
+          question.answer1, question.answer2,
+          question.answer3, question.answer4
         ].filter((a: any) => a != null && a.trim() !== '')
          .sort(() => Math.random() - 0.5);
 
@@ -171,11 +184,8 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
           return;
         }
 
-        if (res.status === 'timeout') {
-          this.statusMessage = 'איחרת את המועד! ⏰';
-        } else {
-          this.statusMessage = res.correct === true ? 'כל הכבוד! ✨' : 'טעות... 😕';
-        }
+        this.statusMessage = res.status === 'timeout' ? 'איחרת את המועד! ⏰'
+          : res.correct === true ? 'כל הכבוד! ✨' : 'טעות... 😕';
 
         this.cdr.detectChanges();
         setTimeout(() => this.loadQuestionFromServer(), 2000);
@@ -194,19 +204,37 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
         next: (data: any[]) => {
           if (!Array.isArray(data)) return;
 
-          // זיהוי שחקנים חדשים והצגת notification
+          const newNames = new Set(data.map(p =>
+            (p.displayName || p.name || 'שחקן').trim().toLowerCase()
+          ));
+
+          // זיהוי שחקנים שנכנסו — שם חדש שלא היה קודם
           data.forEach(item => {
             const name = (item.displayName || item.name || 'שחקן').trim();
-            if (!this.previousPlayerNames.has(name)) {
-              this.previousPlayerNames.add(name);
-              // לא מציגים notification לשחקן הראשון (זה אני)
+            const key = name.toLowerCase();
+            if (!this.previousPlayerNames.has(key)) {
+              this.previousPlayerNames.add(key);
+              // לא מציגים toast לשחקן הראשון (זה אני)
               if (this.previousPlayerNames.size > 1) {
-                this.showJoinNotification(name, item.image || '');
+                this.showNotification(name, item.image || '', 'join');
               }
             }
           });
 
-          // עדכון רשימת שחקנים עם סטטוס תשובה מהשרת
+          // זיהוי שחקנים שיצאו — שם שהיה ועכשיו נעלם
+          this.previousPlayerNames.forEach(key => {
+            if (!newNames.has(key)) {
+              // מוצאים את השם המקורי (לא lowercase)
+              const leftPlayer = this.players.find(p =>
+                p.playerName.toLowerCase() === key
+              );
+              if (leftPlayer) {
+                this.showNotification(leftPlayer.playerName, leftPlayer.avatar, 'leave');
+              }
+              this.previousPlayerNames.delete(key);
+            }
+          });
+
           this.players = data.map(p => ({
             playerName: (p.displayName || p.name || 'שחקן').trim(),
             avatar: p.image || '',
@@ -221,20 +249,18 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  // הצגת toast של שחקן חדש ל-3 שניות
-  showJoinNotification(playerName: string, avatar: string) {
-    const notification = { playerName, avatar };
-    this.joinNotifications.push(notification);
+  showNotification(playerName: string, avatar: string, type: 'join' | 'leave') {
+    const note = { playerName, avatar, type };
+    this.notifications.push(note);
     this.cdr.detectChanges();
 
     setTimeout(() => {
-      const idx = this.joinNotifications.indexOf(notification);
-      if (idx !== -1) this.joinNotifications.splice(idx, 1);
+      const idx = this.notifications.indexOf(note);
+      if (idx !== -1) this.notifications.splice(idx, 1);
       this.cdr.detectChanges();
     }, 3000);
   }
 
-  // צבע אוואטר אקראי לפי שם
   getAvatarColor(name: string | undefined): string {
     if (!name) return '#7b1fa2';
     const colors = ['#f44336','#e91e63','#9c27b0','#673ab7',

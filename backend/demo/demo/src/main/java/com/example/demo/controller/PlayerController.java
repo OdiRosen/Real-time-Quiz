@@ -31,7 +31,18 @@ public class PlayerController {
         }
     }
 
-    // FIX: מקבל playerId כדי לשלוף את השאלה האישית של כל שחקן
+    // endpoint חדש — שחקן עוזב
+    @PostMapping("/{quizId}/leave")
+    public ResponseEntity<?> leave(@PathVariable Long quizId,
+                                   @RequestParam String playerId) {
+        try {
+            playerService.removePlayer(quizId, playerId);
+            return ResponseEntity.ok(Map.of("message", "השחקן הוסר בהצלחה"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("message", "ok")); // לא קורסים אם כבר לא קיים
+        }
+    }
+
     @GetMapping("/question/{quizId}")
     public ResponseEntity<?> getSyncQuestion(
             @PathVariable Long quizId,
@@ -39,7 +50,7 @@ public class PlayerController {
         try {
             Question question = playerService.getSyncQuestion(quizId, playerId);
             if (question == null) {
-                return ResponseEntity.noContent().build(); // 204 = סיום חידון
+                return ResponseEntity.noContent().build();
             }
             return ResponseEntity.ok(question);
         } catch (RuntimeException e) {

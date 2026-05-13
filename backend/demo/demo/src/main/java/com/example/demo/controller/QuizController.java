@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/quiz")
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.PATCH, RequestMethod.OPTIONS}, allowCredentials = "true")
 public class QuizController {
 
     @Autowired
@@ -107,6 +107,18 @@ public class QuizController {
 
             Quiz updated = quizService.saveWinner(id, winnerName, winnerScore);
             return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteQuiz(@PathVariable Long id) {
+        try {
+            quizService.deleteQuiz(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

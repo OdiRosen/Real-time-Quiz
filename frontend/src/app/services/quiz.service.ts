@@ -40,7 +40,11 @@ export class QuizService {
     return this.http.put<Quiz>(`${this.apiUrl}/${id}`, quiz);
   }
 
-    saveWinner(quizId: number, winnerName: string, winnerScore: number): Observable<Quiz> {
+  deleteQuiz(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  saveWinner(quizId: number, winnerName: string, winnerScore: number): Observable<Quiz> {
     return this.http.patch<Quiz>(`${this.apiUrl}/${quizId}/winner`, {
       winnerName,
       winnerScore

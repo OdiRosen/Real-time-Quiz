@@ -72,4 +72,11 @@ public class QuizService {
         quiz.setWinnerScore(score);
         return quizRepository.save(quiz);
     }
+
+    public void deleteQuiz(Long id) {
+        if (!quizRepository.existsById(id)) {
+            throw new RuntimeException("Quiz not found");
+        }
+        quizRepository.deleteById(id);
+    }
 }
