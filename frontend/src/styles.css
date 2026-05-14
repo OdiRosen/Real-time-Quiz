@@ -1,6 +1,38 @@
-/* You can add global styles to this file, and also import other style files */
-@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap');
+/* ===== GLOBAL STYLES — שחור + ירוק ניאון ===== */
 
-body, html {
-    font-family: 'Assistant', sans-serif !important;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
+
+html {
+  background: #000000 !important;
+  min-height: 100%;
+}
+
+body {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  min-height: 100vh;
+  color: #c8ffcc;
+  font-family: 'Exo 2', sans-serif;
+  direction: rtl;
+  overflow-x: hidden;
+}
+
+/* מונע רקע לבן מ-Angular root */
+app-root {
+  display: block;
+  background: #000000;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: rgba(57,255,20,0.35); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(57,255,20,0.6); }
+
+/* Selection */
+::selection { background: rgba(57,255,20,0.2); color: #fff; }
