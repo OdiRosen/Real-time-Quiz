@@ -919,3 +919,287 @@ button:hover { transform: translateY(-1px); }
   .role-cards-container { flex-direction: column; gap: 9px; }
   .section-header h1 { font-size: 1.55rem; }
 }
+
+/* ============================================================
+   AUTH — טרמינל / סייברפאנק (מוקאפ)
+   ============================================================ */
+.auth-view-active .app-navbar {
+  background: rgba(5, 10, 5, 0.92);
+  border-color: rgba(0, 255, 65, 0.18);
+  box-shadow: 0 0 0 1px rgba(0, 255, 65, 0.06), 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.panel.cyber-auth {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 1.75rem 1.65rem 1.5rem;
+  border-radius: 18px;
+  background: #050a05;
+  border: 1px solid rgba(57, 255, 20, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(0, 255, 65, 0.12),
+    0 0 28px rgba(57, 255, 20, 0.22),
+    0 24px 56px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(57, 255, 20, 0.06);
+  backdrop-filter: none;
+}
+
+.panel.cyber-auth::before {
+  left: 8%;
+  right: 8%;
+  opacity: 0.85;
+  background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
+}
+
+.cyber-auth-header.section-header {
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.cyber-auth-titles {
+  text-align: right;
+  flex: 1;
+  min-width: 0;
+}
+
+.cyber-auth-title {
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--accent-bright);
+  text-shadow: 0 0 12px rgba(57, 255, 20, 0.45);
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.cyber-auth-subtitle {
+  margin: 0.5rem 0 0;
+  color: #7a9a88;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.terminal-cursor {
+  display: inline;
+  margin-inline-start: 2px;
+  color: var(--accent-bright);
+  font-weight: 700;
+  animation: cyber-cursor-blink 1s step-end infinite;
+}
+
+@keyframes cyber-cursor-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.auth-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #6d8f7a !important;
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-block: 4px;
+}
+
+.auth-back-btn:hover {
+  color: #a8c9b4 !important;
+  background: rgba(0, 255, 65, 0.06);
+}
+
+.auth-back-chevron {
+  font-size: 0.95rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.cyber-role-cards.role-cards-container {
+  gap: 14px;
+  margin-bottom: 1.25rem;
+}
+
+.cyber-role-cards .role-card {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 80, 40, 0.55);
+  border-radius: 14px;
+  padding: 18px 14px 16px;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.cyber-role-cards .role-card:hover {
+  border-color: rgba(57, 255, 20, 0.28);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5), 0 0 18px rgba(57, 255, 20, 0.12);
+  transform: translateY(-2px);
+}
+
+.cyber-role-cards .role-card.active {
+  background: rgba(0, 40, 18, 0.35);
+  border-color: var(--accent-bright);
+  box-shadow:
+    0 0 0 1px rgba(57, 255, 20, 0.5),
+    0 0 22px rgba(57, 255, 20, 0.28),
+    inset 0 0 24px rgba(57, 255, 20, 0.04);
+}
+
+.cyber-role-cards .role-card.active::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-bright);
+  box-shadow: 0 0 10px var(--accent-bright), 0 0 18px rgba(57, 255, 20, 0.7);
+  pointer-events: none;
+}
+
+.cyber-role-cards .role-card .check-mark {
+  display: none;
+}
+
+.cyber-role-cards .role-title {
+  font-family: var(--font-body);
+  font-size: 1.02rem;
+  color: #e8f5ec;
+}
+
+.cyber-role-cards .role-card.active .role-title {
+  color: var(--accent-bright);
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.35);
+}
+
+.cyber-role-cards .role-desc {
+  color: #6d8a78;
+  font-size: 0.78rem;
+}
+
+.cyber-role-cards .role-card.active .role-desc {
+  color: #8aaf9a;
+}
+
+.cyber-role-cards .role-icon {
+  filter: grayscale(0.25);
+  opacity: 0.92;
+}
+
+.cyber-role-cards .role-card.active .role-icon {
+  filter: none;
+  opacity: 1;
+}
+
+.cyber-auth-form.form-grid {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.cyber-auth-form .form-actions {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+}
+
+.cyber-auth-form .auth-separator {
+  grid-column: 1 / -1;
+}
+
+.cyber-auth-form .google-auth-wrapper {
+  grid-column: 1 / -1;
+}
+
+.cyber-auth .input-card {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(57, 255, 20, 0.22);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.cyber-auth .input-card label {
+  color: var(--accent-bright);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-align: right;
+  text-transform: none;
+}
+
+.cyber-auth .input-card input {
+  border-radius: 9px;
+  border: 1px solid rgba(57, 255, 20, 0.35);
+  background: #020402;
+  color: #d4e8dc;
+  padding: 12px 14px;
+}
+
+.cyber-auth .input-card input::placeholder {
+  color: #4a6656;
+}
+
+.cyber-auth .input-card input:focus {
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 2px rgba(57, 255, 20, 0.15), 0 0 14px rgba(57, 255, 20, 0.12);
+}
+
+.cyber-auth .primary-btn {
+  border-radius: 12px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  box-shadow:
+    0 0 16px rgba(57, 255, 20, 0.55),
+    0 0 36px rgba(57, 255, 20, 0.28);
+}
+
+.cyber-auth .primary-btn:hover {
+  box-shadow:
+    0 0 22px rgba(57, 255, 20, 0.65),
+    0 0 48px rgba(57, 255, 20, 0.32);
+}
+
+.cyber-auth .auth-separator {
+  color: #4a6356;
+  margin: 18px 0 14px;
+}
+
+.cyber-auth .auth-separator::before,
+.cyber-auth .auth-separator::after {
+  background: rgba(57, 255, 20, 0.12);
+}
+
+.google-btn--cyber {
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(57, 255, 20, 0.45);
+  color: #e8f5ec;
+  width: 100%;
+  max-width: 100%;
+}
+
+.google-btn--cyber:hover {
+  background: rgba(57, 255, 20, 0.06);
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 18px rgba(57, 255, 20, 0.22);
+}
+
+.cyber-admin-google {
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.cyber-admin-hint {
+  margin-bottom: 1rem;
+  color: #7a9a88;
+}
+
+.cyber-auth-footer-hint {
+  margin-top: 1rem;
+  text-align: center;
+  color: #5c7a68;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 560px) {
+  .cyber-auth-title {
+    font-size: 1.2rem;
+  }
+}

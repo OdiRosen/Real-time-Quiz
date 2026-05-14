@@ -1,4 +1,4 @@
-<div class="app-shell">
+<div class="app-shell" [class.auth-view-active]="screen === 'auth'">
   <header class="app-navbar">
     <div class="app-brand">
       <span class="brand-logo">Q</span>
@@ -32,39 +32,42 @@
 </div>
   </header>
 
-  <!-- מסך התחברות -->
-<section *ngIf="screen === 'auth'" class="panel glass auth-panel">
-    <div class="section-header">
-      <div>
-        <h1>התחברות למערכת</h1>
-        <p class="subtitle">בחר את התפקיד שלך כדי להמשיך</p>
+  <!-- מסך התחברות — מראה טרמינל / סייברפאנק -->
+<section *ngIf="screen === 'auth'" class="panel auth-panel cyber-auth">
+    <div class="section-header cyber-auth-header">
+      <div class="cyber-auth-titles">
+        <h1 class="cyber-auth-title">התחברות למערכת</h1>
+        <p class="subtitle cyber-auth-subtitle">
+          בחר את התפקיד שלך<span class="terminal-cursor" aria-hidden="true">_</span>
+        </p>
       </div>
-      <button class="text-button" (click)="resetRole()">חזרה</button>
+      <button type="button" class="text-button auth-back-btn" (click)="resetRole()">
+        <span class="auth-back-chevron" aria-hidden="true">&lt;</span>
+        חזרה
+      </button>
     </div>
 
     <div class="role-selection-wrapper">
-      <div class="role-cards-container">
+      <div class="role-cards-container cyber-role-cards">
         <div class="role-card" [class.active]="selectedRole === 'player'" (click)="selectedRole = 'player'">
           <div class="role-icon">🎮</div>
           <div class="role-info">
             <span class="role-title">שחקן</span>
-            <span class="role-desc">כניסה למשחק עם שם וסיסמה</span>
+            <span class="role-desc">כניסה עם שם וסיסמה</span>
           </div>
-          <div class="check-mark">✓</div>
         </div>
 
         <div class="role-card" [class.active]="selectedRole === 'admin'" (click)="selectedRole = 'admin'">
           <div class="role-icon">🛠️</div>
           <div class="role-info">
             <span class="role-title">מנהל</span>
-            <span class="role-desc">ניהול חידונים באמצעות Google</span>
+            <span class="role-desc">ניהול חידונים</span>
           </div>
-          <div class="check-mark">✓</div>
         </div>
       </div>
     </div>
 
-<div class="form-grid" *ngIf="selectedRole === 'player'">
+<div class="form-grid cyber-auth-form" *ngIf="selectedRole === 'player'">
   <div class="input-card">
     <label>שם משתמש</label>
     <input [(ngModel)]="authEmail" placeholder="הכנס שם שחקן" />
@@ -82,7 +85,7 @@
   </div>
 
   <div class="google-auth-wrapper">
-      <button class="google-btn" (click)="triggerGoogleSignIn()" type="button" style="margin: 0 auto;">
+      <button class="google-btn google-btn--cyber" (click)="triggerGoogleSignIn()" type="button">
         <span class="google-btn__icon">
           <svg viewBox="0 0 24 24" class="google-icon" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -96,9 +99,9 @@
   </div>
 </div>
 
-    <div class="admin-google-auth" *ngIf="selectedRole === 'admin'" style="text-align: center; padding: 20px;">
-      <p class="hint" style="margin-bottom: 20px;">מנהלים מתחברים למערכת באמצעות חשבון Google בלבד</p>
-      <button class="google-btn" (click)="triggerGoogleSignIn()" type="button" style="margin: 0 auto;">
+    <div class="admin-google-auth cyber-admin-google" *ngIf="selectedRole === 'admin'">
+      <p class="hint cyber-admin-hint">מנהלים מתחברים למערכת באמצעות חשבון Google בלבד</p>
+      <button class="google-btn google-btn--cyber" (click)="triggerGoogleSignIn()" type="button">
         <span class="google-btn__icon">
           <svg viewBox="0 0 24 24" class="google-icon" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -111,7 +114,7 @@
       </button>
     </div>
 
-    <p class="hint" style="margin-top: 15px;">{{ authMessage || 'בחר תפקיד כדי להמשיך.' }}</p>
+    <p class="hint cyber-auth-footer-hint">{{ authMessage || 'בחר תפקיד כדי להמשיך.' }}</p>
   </section>
   
   <!-- מסך שחקן -->
