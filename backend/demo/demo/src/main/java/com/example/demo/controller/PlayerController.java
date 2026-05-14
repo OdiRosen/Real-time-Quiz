@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "https://real-time-quiz-frontend.onrender.com/", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/player")
 public class PlayerController {

@@ -24,7 +24,7 @@ public class DemoApplication {
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true);
-		config.setAllowedOrigins(List.of("http://localhost:4200"));
+		config.setAllowedOrigins(List.of("http://localhost:4200","https://real-time-quiz-frontend.onrender.com/"));
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 
