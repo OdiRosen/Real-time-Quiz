@@ -1,4 +1,8 @@
-<div class="app-shell" [class.auth-view-active]="screen === 'auth'">
+<div
+  class="app-shell"
+  [class.auth-view-active]="screen === 'auth'"
+  [class.shell-wide]="screen === 'admin'"
+>
   <header class="app-navbar" *ngIf="screen !== 'auth'">
     <div class="app-brand">
       <span class="brand-logo">Q</span>

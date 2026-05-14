@@ -66,7 +66,12 @@
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
-  padding: 24px 16px 56px;
+  min-height: 100dvh;
+  padding:
+    max(24px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(56px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
   font-family: var(--font-body);
   direction: rtl;
   color: var(--text-primary);
@@ -80,7 +85,11 @@
   justify-content: center;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 20px 16px 28px;
+  padding:
+    max(20px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(28px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
 }
 
 /* ============================================================
@@ -88,14 +97,18 @@
    ============================================================ */
 .app-shell {
   width: 100%;
-  max-width: 560px;
+  max-width: min(560px, calc(100vw - 32px));
   margin: 0 auto;
   position: relative;
   z-index: 1;
 }
 
+.app-shell.shell-wide {
+  max-width: min(960px, calc(100vw - 32px));
+}
+
 .app-shell.auth-view-active {
-  max-width: 400px;
+  max-width: min(420px, calc(100vw - 24px));
   width: 100%;
   flex-shrink: 0;
 }
@@ -270,6 +283,12 @@
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.section-header > div:first-of-type {
+  min-width: 0;
+  flex: 1 1 12rem;
 }
 
 .section-header h1 {
@@ -925,15 +944,164 @@ button:hover { transform: translateY(-1px); }
   .form-grid, .quiz-panel, .editor-grid, .admin-login-grid {
     grid-template-columns: 1fr;
   }
+
+  .player-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-navbar {
+    flex-wrap: wrap;
+    row-gap: 10px;
+    padding: 10px 14px;
+    top: max(8px, env(safe-area-inset-top));
+  }
+
+  .app-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .nav-actions {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .brand-name {
+    font-size: 0.9rem;
+  }
+
+  .brand-tag {
+    font-size: 0.68rem;
+  }
+
+  .nav-user {
+    max-width: min(200px, 42vw);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .section-header h1 {
+    font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+  }
+
+  .text-button,
+  .auth-back-btn {
+    min-height: 40px;
+    padding-inline: 10px;
+  }
 }
 
 @media (max-width: 560px) {
-  :host { padding: 12px 10px 40px; }
-  :host:has(.auth-view-active) { padding: 14px 12px 24px; }
-  .panel { padding: 1.35rem; }
-  .role-cards-container { flex-direction: column; gap: 9px; }
-  .section-header h1 { font-size: 1.55rem; }
-  .cyber-auth-title { font-size: 1.2rem; }
+  :host {
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(40px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  :host:has(.auth-view-active) {
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(24px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .app-shell {
+    max-width: calc(100vw - 20px);
+  }
+
+  .app-shell.shell-wide {
+    max-width: calc(100vw - 20px);
+  }
+
+  .app-shell.auth-view-active {
+    max-width: calc(100vw - 20px);
+  }
+
+  .panel {
+    padding: 1.35rem;
+  }
+
+  .role-cards-container {
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .section-header h1 {
+    font-size: 1.45rem;
+  }
+
+  .cyber-auth-title {
+    font-size: 1.15rem;
+  }
+
+  .cyber-auth-header {
+    flex-wrap: wrap;
+  }
+
+  .quiz-list {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .panel input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  .panel select,
+  .panel textarea {
+    font-size: max(1rem, 16px);
+  }
+
+  .cyber-auth-footer-hint {
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 400px) {
+  .cyber-auth-title {
+    font-size: 1.05rem;
+  }
+
+  .cyber-auth-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .panel.cyber-auth {
+    padding: 1.1rem 0.95rem 1.1rem;
+    border-radius: 12px;
+  }
+
+  .cyber-auth-header {
+    gap: 8px;
+    margin-bottom: 1rem;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .auth-back-btn {
+    align-self: flex-end;
+  }
+
+  .cyber-role-cards.role-cards-container {
+    gap: 8px;
+  }
+
+  .cyber-role-cards .role-card {
+    padding: 0.85rem 0.65rem 0.8rem;
+  }
+
+  .cyber-role-cards .role-icon-svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .google-btn.google-btn--cyber {
+    font-size: 0.86rem;
+    padding-inline: 12px;
+  }
 }
 
 /* ============================================================
