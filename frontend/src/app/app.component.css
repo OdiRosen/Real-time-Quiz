@@ -1085,17 +1085,34 @@ button:hover { transform: translateY(-1px); }
 }
 
 .cyber-role-cards .role-icon {
-  font-size: 2rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 0.55rem;
-  display: block;
-  filter: grayscale(0.35) brightness(0.92);
-  opacity: 0.9;
+  min-height: 48px;
 }
 
-.cyber-role-cards .role-card.active .role-icon {
-  filter: drop-shadow(0 0 8px rgba(57, 255, 20, 0.85));
+.cyber-role-cards .role-icon-svg {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  color: #6e9a80;
+  filter: drop-shadow(0 0 3px rgba(57, 255, 20, 0.4));
+}
+
+.cyber-role-cards .role-card:not(.active) .role-icon-svg {
+  color: #5a7a68;
+  opacity: 0.88;
+  filter: drop-shadow(0 0 2px rgba(57, 255, 20, 0.22));
+}
+
+.cyber-role-cards .role-card.active .role-icon-svg {
+  color: #39ff14;
   opacity: 1;
+  filter:
+    drop-shadow(0 0 1px rgba(57, 255, 20, 1))
+    drop-shadow(0 0 6px rgba(57, 255, 20, 0.95))
+    drop-shadow(0 0 14px rgba(57, 255, 20, 0.55));
 }
 
 .cyber-role-cards .role-title {

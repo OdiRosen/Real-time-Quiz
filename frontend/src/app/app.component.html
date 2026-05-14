@@ -53,7 +53,16 @@
         [class.active]="selectedRole === 'player'"
         (click)="selectedRole = 'player'"
       >
-        <div class="role-icon" aria-hidden="true">🎮</div>
+        <div class="role-icon" aria-hidden="true">
+          <svg class="role-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2.5" y="9" width="19" height="7" rx="2.5" stroke="currentColor" stroke-width="1.35" />
+            <path d="M7.25 11.75v2.5M6 13h2.5" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" />
+            <circle cx="15.25" cy="11.75" r="1.05" stroke="currentColor" stroke-width="1.2" fill="none" />
+            <circle cx="17.75" cy="11.75" r="1.05" stroke="currentColor" stroke-width="1.2" fill="none" />
+            <circle cx="15.25" cy="14.25" r="1.05" stroke="currentColor" stroke-width="1.2" fill="none" />
+            <circle cx="17.75" cy="14.25" r="1.05" stroke="currentColor" stroke-width="1.2" fill="none" />
+          </svg>
+        </div>
         <div class="role-info">
           <span class="role-title">שחקן</span>
           <span class="role-desc">כניסה עם שם וסיסמה</span>
@@ -65,7 +74,20 @@
         [class.active]="selectedRole === 'admin'"
         (click)="selectedRole = 'admin'"
       >
-        <div class="role-icon" aria-hidden="true">🛠️</div>
+        <div class="role-icon" aria-hidden="true">
+          <svg class="role-icon-svg role-icon-svg--wrench" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g transform="rotate(-36 12 12)">
+              <path
+                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                stroke="currentColor"
+                stroke-width="1.25"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                fill="none"
+              />
+            </g>
+          </svg>
+        </div>
         <div class="role-info">
           <span class="role-title">מנהל</span>
           <span class="role-desc">ניהול חידונים</span>
