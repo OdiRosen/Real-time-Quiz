@@ -28,6 +28,29 @@ app-root {
   min-height: 100vh;
 }
 
+/* זה ישפיע על כל כותרות ה-h1 באפליקציה באופן אוטומטי */
+h1 {
+  color: #f0fff8; 
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0; /* מונע רווחים מיותרים ב-Navbar */
+  
+  /* אפקט המנטה-ניאון מהנקודות של Render */
+  text-shadow: 
+    0 0 5px #fff, 
+    0 0 10px #2effa7, 
+    0 0 20px #2effa7, 
+    0 0 40px rgba(46, 255, 167, 0.5);
+}
+
+/* אם את רוצה שגם הקישורים ב-Navbar יקבלו אפקט דומה כשעוברים עליהם */
+nav a:hover {
+  color: #2effa7;
+  text-shadow: 0 0 8px #2effa7;
+  transition: 0.3s;
+}
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: #000; }
