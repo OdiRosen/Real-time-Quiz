@@ -1,16 +1,31 @@
 package com.example.demo.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "players")
 public class Player {
-    private String playerId;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id; // מומלץ להשתמש ב-Long כ-ID של מסד נתונים
+
+    private String playerId; // ה-ID שאת משתמשת בו באפליקציה (אפשר להשאיר אותו)
     private String displayName;
     private String image;
     private int score;
     private int currentQuestionIndex = 0;
     private long totalTimeTaken;
 
-    // שדות חדשים לאנימציות
     private boolean hasAnswered = false;
-    private String lastAnswerStatus = "none"; // "correct", "wrong", "none"
+    private String lastAnswerStatus = "none";
+
+    // בנאי ריק חובה ל-JPA
+    public Player() {}
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getPlayerId() { return playerId; }
     public void setPlayerId(String playerId) { this.playerId = playerId; }

@@ -1,20 +1,262 @@
 <!doctype html>
-<html lang="en">
+<html lang="he">
   <head>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <meta charset="utf-8" />
     <title>QuizApp</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script>
-  if (global === undefined) {
-    var global = window;
-  }
-</script>
+    <script>
+      if (typeof global === 'undefined') { var global = window; }
+    </script>
+
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        background: #000000 !important;
+        min-height: 100%;
+        overflow-x: hidden;
+      }
+
+      /* ===== CANVAS BACKGROUND ===== */
+      #bg-canvas {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      app-root {
+        position: relative;
+        z-index: 1;
+        display: block;
+        min-height: 100vh;
+      }
+    </style>
   </head>
   <body>
+
+    <!-- Canvas for animated background -->
+    <canvas id="bg-canvas"></canvas>
+
     <app-root></app-root>
+
+    <script>
+    (function() {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let W, H, mouse = { x: -9999, y: -9999 };
+
+      // ===== RESIZE =====
+      function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      // ===== MOUSE TRACKING =====
+      window.addEventListener('mousemove', e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+      });
+      window.addEventListener('mouseleave', () => {
+        mouse.x = -9999; mouse.y = -9999;
+      });
+
+      // ===== PARTICLES =====
+      const NEON = '#39ff14';
+      const NEON2 = '#00ff88';
+      const PARTICLE_COUNT = 90;
+
+      class Particle {
+        constructor() { this.reset(true); }
+
+        reset(random) {
+          this.x  = random ? Math.random() * W : Math.random() * W;
+          this.y  = random ? Math.random() * H : -10;
+          this.vx = (Math.random() - 0.5) * 0.4;
+          this.vy = Math.random() * 0.5 + 0.15;
+          this.r  = Math.random() * 1.6 + 0.4;
+          this.alpha = Math.random() * 0.6 + 0.2;
+          this.color = Math.random() > 0.5 ? NEON : NEON2;
+          this.life = 0;
+          this.maxLife = Math.random() * 400 + 200;
+        }
+
+        update() {
+          // Mouse repulsion
+          const dx = this.x - mouse.x;
+          const dy = this.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            const force = (120 - dist) / 120;
+            this.vx += (dx / dist) * force * 0.6;
+            this.vy += (dy / dist) * force * 0.6;
+          }
+
+          // Velocity damping
+          this.vx *= 0.98;
+          this.vy *= 0.98;
+
+          this.x += this.vx;
+          this.y += this.vy;
+          this.life++;
+
+          // Fade in/out
+          const progress = this.life / this.maxLife;
+          if (progress < 0.15) {
+            this.alpha = (progress / 0.15) * 0.7;
+          } else if (progress > 0.75) {
+            this.alpha = ((1 - progress) / 0.25) * 0.7;
+          }
+
+          if (this.life > this.maxLife || this.y > H + 20 || this.x < -20 || this.x > W + 20) {
+            this.reset(false);
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.alpha;
+          ctx.shadowBlur  = 8;
+          ctx.shadowColor = this.color;
+          ctx.fillStyle   = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      const particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
+
+      // ===== GRID LINES =====
+      const GRID_SIZE = 60;
+      let gridOffset = 0;
+
+      function drawGrid() {
+        const baseAlpha = 0.025;
+        ctx.strokeStyle = NEON;
+        ctx.lineWidth = 0.5;
+
+        // Vertical lines
+        for (let x = 0; x <= W + GRID_SIZE; x += GRID_SIZE) {
+          const px = x - (gridOffset % GRID_SIZE);
+          // Glow near mouse
+          const distToMouse = Math.abs(px - mouse.x);
+          const glow = distToMouse < 100 ? baseAlpha + (1 - distToMouse / 100) * 0.08 : baseAlpha;
+          ctx.globalAlpha = glow;
+          ctx.beginPath();
+          ctx.moveTo(px, 0);
+          ctx.lineTo(px, H);
+          ctx.stroke();
+        }
+
+        // Horizontal lines
+        for (let y = 0; y <= H + GRID_SIZE; y += GRID_SIZE) {
+          const py = y - (gridOffset % GRID_SIZE);
+          const distToMouse = Math.abs(py - mouse.y);
+          const glow = distToMouse < 100 ? baseAlpha + (1 - distToMouse / 100) * 0.08 : baseAlpha;
+          ctx.globalAlpha = glow;
+          ctx.beginPath();
+          ctx.moveTo(0, py);
+          ctx.lineTo(W, py);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+      }
+
+      // ===== MOUSE GLOW =====
+      function drawMouseGlow() {
+        if (mouse.x < 0) return;
+        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 180);
+        grad.addColorStop(0,   'rgba(57,255,20,0.07)');
+        grad.addColorStop(0.5, 'rgba(57,255,20,0.02)');
+        grad.addColorStop(1,   'rgba(57,255,20,0)');
+        ctx.fillStyle = grad;
+        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 180, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ===== SCAN LINE =====
+      let scanY = 0;
+
+      function drawScanLine() {
+        scanY = (scanY + 0.8) % H;
+        const grad = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 10);
+        grad.addColorStop(0,   'rgba(57,255,20,0)');
+        grad.addColorStop(0.7, 'rgba(57,255,20,0.025)');
+        grad.addColorStop(1,   'rgba(57,255,20,0.005)');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, scanY - 60, W, 70);
+      }
+
+      // ===== CONNECTION LINES between nearby particles =====
+      function drawConnections() {
+        const MAX_DIST = 100;
+        ctx.lineWidth = 0.4;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < MAX_DIST) {
+              const alpha = (1 - dist / MAX_DIST) * 0.18;
+              ctx.globalAlpha = alpha;
+              ctx.strokeStyle = NEON;
+              ctx.shadowBlur  = 4;
+              ctx.shadowColor = NEON;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur  = 0;
+      }
+
+      // ===== MAIN LOOP =====
+      function loop() {
+        ctx.clearRect(0, 0, W, H);
+
+        // Background
+        ctx.fillStyle = '#000000';
+        ctx.globalAlpha = 1;
+        ctx.fillRect(0, 0, W, H);
+
+        // Grid
+        drawGrid();
+        gridOffset += 0.3;
+
+        // Scan line
+        drawScanLine();
+
+        // Mouse glow
+        drawMouseGlow();
+
+        // Connections
+        drawConnections();
+
+        // Particles
+        particles.forEach(p => { p.update(); p.draw(); });
+
+        requestAnimationFrame(loop);
+      }
+
+      loop();
+    })();
+    </script>
   </body>
 </html>
