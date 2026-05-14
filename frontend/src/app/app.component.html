@@ -1,5 +1,5 @@
 <div class="app-shell" [class.auth-view-active]="screen === 'auth'">
-  <header class="app-navbar">
+  <header class="app-navbar" *ngIf="screen !== 'auth'">
     <div class="app-brand">
       <span class="brand-logo">Q</span>
       <div>
@@ -32,60 +32,66 @@
 </div>
   </header>
 
-  <!-- מסך התחברות — מראה טרמינל / סייברפאנק -->
-<section *ngIf="screen === 'auth'" class="panel auth-panel cyber-auth">
-    <div class="section-header cyber-auth-header">
+  <!-- מסך התחברות — התאמה למוקאפ -->
+<section *ngIf="screen === 'auth'" class="panel auth-panel cyber-auth" dir="rtl">
+    <header class="cyber-auth-header">
       <div class="cyber-auth-titles">
         <h1 class="cyber-auth-title">התחברות למערכת</h1>
-        <p class="subtitle cyber-auth-subtitle">
+        <p class="cyber-auth-subtitle">
           בחר את התפקיד שלך<span class="terminal-cursor" aria-hidden="true">_</span>
         </p>
       </div>
-      <button type="button" class="text-button auth-back-btn" (click)="resetRole()">
-        <span class="auth-back-chevron" aria-hidden="true">&lt;</span>
+      <button type="button" class="auth-back-btn" (click)="resetRole()">
         חזרה
+        <span class="auth-back-chevron" aria-hidden="true">&lt;</span>
       </button>
-    </div>
+    </header>
 
-    <div class="role-selection-wrapper">
-      <div class="role-cards-container cyber-role-cards">
-        <div class="role-card" [class.active]="selectedRole === 'player'" (click)="selectedRole = 'player'">
-          <div class="role-icon">🎮</div>
-          <div class="role-info">
-            <span class="role-title">שחקן</span>
-            <span class="role-desc">כניסה עם שם וסיסמה</span>
-          </div>
+    <div class="role-cards-container cyber-role-cards">
+      <div
+        class="role-card cyber-role-card"
+        [class.active]="selectedRole === 'player'"
+        (click)="selectedRole = 'player'"
+      >
+        <div class="role-icon" aria-hidden="true">🎮</div>
+        <div class="role-info">
+          <span class="role-title">שחקן</span>
+          <span class="role-desc">כניסה עם שם וסיסמה</span>
         </div>
+      </div>
 
-        <div class="role-card" [class.active]="selectedRole === 'admin'" (click)="selectedRole = 'admin'">
-          <div class="role-icon">🛠️</div>
-          <div class="role-info">
-            <span class="role-title">מנהל</span>
-            <span class="role-desc">ניהול חידונים</span>
-          </div>
+      <div
+        class="role-card cyber-role-card"
+        [class.active]="selectedRole === 'admin'"
+        (click)="selectedRole = 'admin'"
+      >
+        <div class="role-icon" aria-hidden="true">🛠️</div>
+        <div class="role-info">
+          <span class="role-title">מנהל</span>
+          <span class="role-desc">ניהול חידונים</span>
         </div>
       </div>
     </div>
 
 <div class="form-grid cyber-auth-form" *ngIf="selectedRole === 'player'">
-  <div class="input-card">
+  <div class="input-card cyber-auth-field">
     <label>שם משתמש</label>
-    <input [(ngModel)]="authEmail" placeholder="הכנס שם שחקן" />
+    <input [(ngModel)]="authEmail" placeholder="הכנס שם שחקן" autocomplete="username" />
   </div>
-  <div class="input-card">
+  <div class="input-card cyber-auth-field">
     <label>סיסמה</label>
-    <input type="password" [(ngModel)]="authPassword" placeholder="סיסמה" />
+    <input type="password" [(ngModel)]="authPassword" placeholder="סיסמה" autocomplete="current-password" />
   </div>
   <div class="form-actions">
-    <button class="primary-btn" (click)="handleLocalAuth()">התחבר / הירשם</button>
+    <button type="button" class="primary-btn cyber-auth-primary" (click)="handleLocalAuth()">התחבר / הירשם</button>
   </div>
 
-  <div class="auth-separator">
+  <div class="auth-separator cyber-auth-sep">
     <span>OR</span>
   </div>
 
   <div class="google-auth-wrapper">
-      <button class="google-btn google-btn--cyber" (click)="triggerGoogleSignIn()" type="button">
+      <button type="button" class="google-btn google-btn--cyber" (click)="triggerGoogleSignIn()">
         <span class="google-btn__icon">
           <svg viewBox="0 0 24 24" class="google-icon" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -101,7 +107,7 @@
 
     <div class="admin-google-auth cyber-admin-google" *ngIf="selectedRole === 'admin'">
       <p class="hint cyber-admin-hint">מנהלים מתחברים למערכת באמצעות חשבון Google בלבד</p>
-      <button class="google-btn google-btn--cyber" (click)="triggerGoogleSignIn()" type="button">
+      <button type="button" class="google-btn google-btn--cyber" (click)="triggerGoogleSignIn()">
         <span class="google-btn__icon">
           <svg viewBox="0 0 24 24" class="google-icon" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -114,7 +120,7 @@
       </button>
     </div>
 
-    <p class="hint cyber-auth-footer-hint">{{ authMessage || 'בחר תפקיד כדי להמשיך.' }}</p>
+    <p *ngIf="authMessage" class="hint cyber-auth-footer-hint">{{ authMessage }}</p>
   </section>
   
   <!-- מסך שחקן -->
