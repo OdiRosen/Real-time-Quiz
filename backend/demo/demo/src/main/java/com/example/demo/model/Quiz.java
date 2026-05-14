@@ -19,9 +19,13 @@ public class Quiz {
     private String winnerName;
     private Integer winnerScore;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "quiz_id") // זה ייצור עמודה בטבלת השאלות שתקשר אותן לחידון
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) // הוספת orphanRemoval
+    @JoinColumn(name = "quiz_id")
     private List<Question> questions;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "quiz_id") // זה מקשר את השחקנים לחידון במסד הנתונים
+    private List<Player> players;
 
     public Quiz() {} // בנאי ריק חובה
 
