@@ -12,11 +12,15 @@ html {
 }
 
 body {
+    margin: 0;
+  padding: 0;
+  background-attachment: fixed; /* זה ימנע מהרקע "לברוח" כשגוללים */
+  background-size: cover;
   background: #000000 !important;
   background-color: #000000 !important;
   min-height: 100vh;
   color: #c8ffcc;
-  font-family: 'Exo 2', sans-serif;
+font-family: 'Inter', sans-serif;
   direction: rtl;
   overflow-x: hidden;
 }
@@ -57,5 +61,39 @@ nav a:hover {
 ::-webkit-scrollbar-thumb { background: rgba(57,255,20,0.35); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(57,255,20,0.6); }
 
-/* Selection */
+/* Selection */:root {
+  --neon-green: #39FF14; /* ירוק ניאון טהור */
+  --dark-bg: #020502;    /* רקע כמעט שחור עם נגיעה ירוקה */
+}
+
+h1 {
+  color: #ffffff; /* טקסט לבן לניגודיות */
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  /* הילה ירוקה זרחנית בלבד */
+  text-shadow: 
+    0 0 7px var(--neon-green),
+    0 0 15px var(--neon-green),
+    0 0 30px rgba(57, 255, 20, 0.4);
+}
+
+.subtitle {
+  color: var(--neon-green);
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+/* שדות הקלט - מסגרת ירוקה דקה ונקייה */
+input {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  color: white;
+  border-radius: 4px;
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus {
+  border-color: var(--neon-green);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+}
 ::selection { background: rgba(57,255,20,0.2); color: #fff; }
