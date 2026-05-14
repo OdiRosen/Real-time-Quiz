@@ -16,7 +16,7 @@ export interface Quiz {
   providedIn: 'root'
 })
 export class QuizService {
-  private apiUrl = 'http://localhost:8080/api/admin/quiz';
+  private apiUrl = 'https://real-time-quiz-5q2e.onrender.com/api/admin/quiz';
 
   constructor(private http: HttpClient) {}
 

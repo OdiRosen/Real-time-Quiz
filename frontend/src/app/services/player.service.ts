@@ -8,7 +8,7 @@ import SockJS from 'sockjs-client';
   providedIn: 'root'
 })
 export class PlayerService {
-  private apiUrl = 'http://localhost:8080/api/player';
+  private apiUrl = 'https://real-time-quiz-5q2e.onrender.com/api/player';
   private stompClient: Client | null = null;
 
   // Subject שמחזיק תמיד את הרשימה האחרונה
@@ -22,7 +22,7 @@ export class PlayerService {
 
     this.stompClient = new Client({
       // FIX: שימוש ב-SockJS כ-factory במקום brokerURL ישיר
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      webSocketFactory: () => new SockJS('https://real-time-quiz-5q2e.onrender.com/ws'),
       reconnectDelay: 5000,
 
       onConnect: () => {
