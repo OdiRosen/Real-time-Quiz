@@ -72,7 +72,7 @@
     max(16px, env(safe-area-inset-right))
     max(56px, env(safe-area-inset-bottom))
     max(16px, env(safe-area-inset-left));
-  font-family: var(--font-body);
+  font-family: 'Assistant', var(--font-body), system-ui, sans-serif;
   direction: rtl;
   color: var(--text-primary);
   background: transparent;
@@ -1102,6 +1102,217 @@ button:hover { transform: translateY(-1px); }
     font-size: 0.86rem;
     padding-inline: 12px;
   }
+}
+
+/* ============================================================
+   CYBER APP — עיצוב אחיד (ניווט, שחקן, מנהל)
+   ============================================================ */
+.app-navbar.cyber-navbar {
+  background: #050a05;
+  border: 1px solid rgba(57, 255, 20, 0.38);
+  border-radius: 14px;
+  box-shadow:
+    0 0 14px rgba(57, 255, 20, 0.16),
+    0 12px 32px rgba(0, 0, 0, 0.55);
+  backdrop-filter: none;
+}
+
+.app-navbar.cyber-navbar .brand-name {
+  font-family: 'Assistant', sans-serif;
+  color: #f4fdf6;
+}
+
+.app-navbar.cyber-navbar .brand-tag {
+  color: #7aab8e;
+}
+
+.panel.cyber-app {
+  font-family: 'Assistant', 'Segoe UI', system-ui, sans-serif;
+  background: #050a05;
+  border: 1px solid rgba(57, 255, 20, 0.4);
+  border-radius: 15px;
+  box-shadow:
+    0 0 12px rgba(57, 255, 20, 0.22),
+    0 20px 48px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 1px rgba(57, 255, 20, 0.05);
+  backdrop-filter: none;
+  padding: 1.5rem 1.35rem 1.4rem;
+}
+
+.panel.cyber-app::before {
+  display: none;
+}
+
+.panel.cyber-app.glass {
+  backdrop-filter: none;
+  box-shadow:
+    0 0 12px rgba(57, 255, 20, 0.22),
+    0 20px 48px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 1px rgba(57, 255, 20, 0.05);
+}
+
+.panel.cyber-app .section-header h1 {
+  font-family: 'Assistant', sans-serif;
+  font-size: clamp(1.15rem, 4vw, 1.75rem);
+  font-weight: 800;
+  color: #39ff14;
+  text-shadow:
+    0 0 8px rgba(57, 255, 20, 0.85),
+    0 0 22px rgba(57, 255, 20, 0.35);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  line-height: 1.2;
+}
+
+.panel.cyber-app .subtitle {
+  color: #8aa399;
+  font-size: 0.9rem;
+}
+
+.panel.cyber-app .text-button {
+  color: #39ff14;
+  font-family: 'Assistant', sans-serif;
+}
+
+.panel.cyber-app .input-card,
+.panel.cyber-app .quiz-list-card,
+.panel.cyber-app .quiz-details-card,
+.panel.cyber-app .create-quiz-card {
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(57, 255, 20, 0.22);
+  border-radius: 10px;
+}
+
+.panel.cyber-app .input-card:focus-within {
+  border-color: rgba(57, 255, 20, 0.5);
+  box-shadow: 0 0 0 2px rgba(57, 255, 20, 0.08);
+}
+
+.panel.cyber-app .input-card label,
+.panel.cyber-app .file-upload-card label {
+  color: #39ff14;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.panel.cyber-app .profile-emoji-label {
+  display: block;
+  margin-top: 0.65rem;
+}
+
+.panel.cyber-app input,
+.panel.cyber-app select,
+.panel.cyber-app textarea {
+  border-radius: 10px;
+  border: 1px solid rgba(57, 255, 20, 0.45);
+  background: #020302;
+  color: #e8f2ec;
+  font-family: inherit;
+}
+
+.panel.cyber-app input::placeholder {
+  color: #5c726a;
+}
+
+.panel.cyber-app input:focus,
+.panel.cyber-app select:focus,
+.panel.cyber-app textarea:focus {
+  border-color: #39ff14;
+  box-shadow: 0 0 0 2px rgba(57, 255, 20, 0.12), 0 0 14px rgba(57, 255, 20, 0.12);
+  background: #010402;
+}
+
+.panel.cyber-app select {
+  cursor: pointer;
+}
+
+.panel.cyber-app .primary-btn {
+  border-radius: 15px;
+  font-family: 'Assistant', sans-serif;
+  font-weight: 800;
+  background: #39ff14;
+  color: #050a05;
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.5), 0 0 26px rgba(57, 255, 20, 0.28);
+}
+
+.panel.cyber-app .primary-btn:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.panel.cyber-app .primary-btn::before {
+  opacity: 0.12;
+}
+
+.panel.cyber-app .hint {
+  color: #c5ddd0;
+}
+
+.panel.cyber-app .hint.small {
+  color: #6d8a78;
+}
+
+.panel.cyber-app .quiz-list-card h3,
+.panel.cyber-app .quiz-details-card h3 {
+  color: #39ff14;
+  font-family: 'Assistant', sans-serif;
+  letter-spacing: 0.08em;
+  opacity: 0.95;
+}
+
+.panel.cyber-app .quiz-card {
+  background: rgba(0, 0, 0, 0.35);
+  border-color: rgba(57, 255, 20, 0.18);
+}
+
+.panel.cyber-app .quiz-card:hover,
+.panel.cyber-app .quiz-card.selected {
+  border-color: #39ff14;
+  background: rgba(0, 40, 18, 0.35);
+}
+
+.panel.cyber-app .quiz-card h4 {
+  color: #eef8f0;
+}
+
+.panel.cyber-app .loading-row {
+  color: #8aa399;
+}
+
+.panel.cyber-app .admin-menu-back {
+  margin-bottom: 1rem;
+}
+
+.panel.cyber-app .empty-quiz-hint {
+  text-align: center;
+  padding: 2rem;
+}
+
+.panel.cyber-app .create-quiz-card {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.panel.cyber-app .admin-footer-message {
+  margin-top: 1.25rem;
+}
+
+.panel.cyber-app.admin-portal .role-card {
+  background: rgba(5, 12, 8, 0.85);
+  border: 1px solid rgba(26, 58, 36, 0.9);
+  border-radius: 14px;
+}
+
+.panel.cyber-app.admin-portal .role-card:hover {
+  border-color: rgba(57, 255, 20, 0.45);
+  box-shadow: 0 0 16px rgba(57, 255, 20, 0.12);
+}
+
+.panel.cyber-app .radio-group label {
+  color: #c5ddd0;
 }
 
 /* ============================================================

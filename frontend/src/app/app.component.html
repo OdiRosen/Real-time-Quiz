@@ -3,7 +3,7 @@
   [class.auth-view-active]="screen === 'auth'"
   [class.shell-wide]="screen === 'admin'"
 >
-  <header class="app-navbar" *ngIf="screen !== 'auth'">
+  <header class="app-navbar cyber-navbar" *ngIf="screen !== 'auth'">
     <div class="app-brand">
       <span class="brand-logo">Q</span>
       <div>
@@ -15,7 +15,7 @@
 <div class="nav-actions">
   <button *ngIf="!currentUser" class="text-button" (click)="openAuth()">התחבר / הירשם</button>
   
-  <div *ngIf="currentUser" class="user-panel" style="display: flex; align-items: center; gap: 10px;">
+  <div *ngIf="currentUser" class="user-panel">
     
     <div class="avatar-container">
       <img *ngIf="currentUser.photoUrl && currentUser.photoUrl.startsWith('http')" 
@@ -150,7 +150,7 @@
   </section>
   
   <!-- מסך שחקן -->
-<section *ngIf="screen === 'player' && !isJoined" class="panel glass">
+<section *ngIf="screen === 'player' && !isJoined" class="panel cyber-app cyber-player-panel">
     <div class="section-header">
       <div>
         <h1>ברוך הבא, {{ customDisplayName || currentUser?.name || 'שחקן' }}</h1>
@@ -169,7 +169,7 @@
         <label>שם תצוגה לחידון</label>
         <input [(ngModel)]="customDisplayName" [placeholder]="currentUser?.name || 'הכנס שם...'" />
         
-        <label style="margin-top: 10px; display: block;">בחר אימוג'י למשחק</label>
+        <label class="profile-emoji-label">בחר אימוג'י למשחק</label>
         <select [(ngModel)]="selectedEmoji" class="emoji-select">
           <option value="default">השתמש בתמונה שלי</option>
           <option value="⭐">⭐ כוכב</option>
@@ -197,7 +197,7 @@
   </app-game-screen>
 
   <!-- מסך מנהל -->
-  <section *ngIf="screen === 'admin'" class="panel glass admin-portal">
+  <section *ngIf="screen === 'admin'" class="panel cyber-app admin-portal">
     <div class="section-header">
       <div>
         <h1>ממשק מנהל</h1>
@@ -227,7 +227,7 @@
     </div>
 
     <div *ngIf="adminActionSelected !== null" class="admin-content-area">
-      <button class="text-button" (click)="adminActionSelected = null" style="margin-bottom: 20px;">
+      <button type="button" class="text-button admin-menu-back" (click)="adminActionSelected = null">
         <span dir="ltr">←</span> חזור לתפריט הראשי
       </button>
 
@@ -245,7 +245,7 @@
   <div class="quiz-list-card">
     <h3>חידונים שלי</h3>
 
-    <div *ngIf="quizzes.length === 0" class="hint" style="text-align:center; padding: 2rem;">
+    <div *ngIf="quizzes.length === 0" class="hint empty-quiz-hint">
       אין חידונים עדיין. צור חידון חדש!
     </div>
 
@@ -313,7 +313,7 @@
 
       <!-- יצירת חידון חדש -->
       <div *ngIf="adminActionSelected === 'create'">
-        <div class="create-quiz-card" style="width: 100%; max-width: 800px; margin: 0 auto;">
+        <div class="create-quiz-card">
           <h3>צור חידון חדש</h3>
           <p class="hint" style="margin-bottom: 1rem;">הקוד יוקצה אוטומטית על ידי המערכת.</p>
           <div class="editor-grid">
@@ -358,7 +358,7 @@
       </div>
     </div>
 
-    <p class="hint" *ngIf="message" style="margin-top: 20px;"
+    <p class="hint admin-footer-message" *ngIf="message"
        [class.error-hint]="message.includes('שגיאה')">
       {{ message }}
     </p>

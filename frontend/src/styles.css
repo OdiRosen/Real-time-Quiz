@@ -1,4 +1,4 @@
-/* ===== GLOBAL STYLES — שחור + ירוק ניאון ===== */
+/* ===== גלובלי — רקע שחור + גלילה ובחירה (סגנונות רכיבים ב-app.component.css) ===== */
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -12,131 +12,45 @@ html {
 }
 
 body {
-    margin: 0;
+  margin: 0;
   padding: 0;
-  background-attachment: fixed; /* זה ימנע מהרקע "לברוח" כשגוללים */
-  background-size: cover;
+  background-attachment: fixed;
   background: #000000 !important;
   background-color: #000000 !important;
   min-height: 100vh;
-  color: #c8ffcc;
-font-family: 'Inter', sans-serif;
+  min-height: 100dvh;
+  color: #dffce8;
+  font-family: 'Assistant', 'Segoe UI', system-ui, sans-serif;
   direction: rtl;
   overflow-x: hidden;
 }
 
-/* מונע רקע לבן מ-Angular root */
 app-root {
   display: block;
   background: #000000;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* זה ישפיע על כל כותרות ה-h1 באפליקציה באופן אוטומטי */
-h1 {
-  color: #f0fff8; 
-  font-family: 'Segoe UI', sans-serif;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin: 0; /* מונע רווחים מיותרים ב-Navbar */
-  
-  /* אפקט המנטה-ניאון מהנקודות של Render */
-  text-shadow: 
-    0 0 5px #fff, 
-    0 0 10px #2effa7, 
-    0 0 20px #2effa7, 
-    0 0 40px rgba(46, 255, 167, 0.5);
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
 
-/* אם את רוצה שגם הקישורים ב-Navbar יקבלו אפקט דומה כשעוברים עליהם */
-nav a:hover {
-  color: #2effa7;
-  text-shadow: 0 0 8px #2effa7;
-  transition: 0.3s;
-}
-/* Scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #000; }
-::-webkit-scrollbar-thumb { background: rgba(57,255,20,0.35); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(57,255,20,0.6); }
-
-/* Selection */:root {
-  --neon-green: #39FF14; /* ירוק ניאון טהור */
-  --dark-bg: #020502;    /* רקע כמעט שחור עם נגיעה ירוקה */
+::-webkit-scrollbar-track {
+  background: #000;
 }
 
-h1 {
-  color: #ffffff; /* טקסט לבן לניגודיות */
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  /* הילה ירוקה זרחנית בלבד */
-  text-shadow: 
-    0 0 7px var(--neon-green),
-    0 0 15px var(--neon-green),
-    0 0 30px rgba(57, 255, 20, 0.4);
-}
-
-.subtitle {
-  color: var(--neon-green);
-  opacity: 0.8;
-  font-weight: 500;
-}
-
-/* שדות הקלט - מסגרת ירוקה דקה ונקייה */
-input {
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(57, 255, 20, 0.3);
-  color: white;
+::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 20, 0.35);
   border-radius: 4px;
-  transition: all 0.2s ease-in-out;
 }
 
-input:focus {
-  border-color: var(--neon-green);
-  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
-}
-::selection { background: rgba(57,255,20,0.2); color: #fff; }
-
-/* בתוך login.component.css */
-
-.login-container {
-  background-color: #050a05;
-  border: 1px solid #1a3a1a;
-  border-radius: 25px;
-  padding: 40px;
-  box-shadow: 0 0 20px rgba(57, 255, 20, 0.15); /* הילה עדינה למסגרת */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(57, 255, 20, 0.6);
 }
 
-.role-selection {
-  display: flex;
-  gap: 20px;
-}
-
-.role-card {
-  border: 1px solid #1a3a1a;
-  border-radius: 15px;
-  background: transparent;
-  transition: 0.3s;
-}
-
-.role-card.active {
-  border-color: #39FF14;
-  box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
-}
-
-.main-btn {
-  background-color: #39FF14;
-  color: #000;
-  font-weight: bold;
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0 0 10px #39FF14;
-}
-
-input {
-  background: transparent;
-  border: 1px solid #1a3a1a;
-  border-radius: 8px;
-  color: white;
+::selection {
+  background: rgba(57, 255, 20, 0.22);
+  color: #fff;
 }

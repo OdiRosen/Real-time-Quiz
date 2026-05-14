@@ -1,38 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 /* ============================================================
-   GAME SCREEN — CYBER DARK THEME
+   GAME SCREEN — ניאון ירוק (כמו שאר האפליקציה)
    ============================================================ */
 :root {
-  --bg-void:       #020510;
-  --bg-card:       rgba(11, 22, 41, 0.75);
-  --bg-elevated:   rgba(16, 30, 58, 0.88);
+  --bg-void:       #020502;
+  --bg-card:       rgba(5, 14, 8, 0.88);
+  --bg-elevated:   rgba(6, 18, 10, 0.92);
 
-  --accent-blue:   #3b7bff;
-  --accent-cyan:   #00e5ff;
-  --accent-green:  #00ffa3;
+  --accent-blue:   #22c55e;
+  --accent-cyan:   #39ff14;
+  --accent-green:  #00ff66;
   --accent-red:    #ff4466;
   --accent-amber:  #ffb800;
 
-  --glow-blue:     0 0 24px rgba(59, 123, 255, 0.5);
-  --glow-cyan:     0 0 24px rgba(0, 229, 255, 0.4);
-  --glow-green:    0 0 20px rgba(0, 255, 163, 0.45);
+  --glow-blue:     0 0 24px rgba(57, 255, 20, 0.45);
+  --glow-cyan:     0 0 24px rgba(57, 255, 20, 0.4);
+  --glow-green:    0 0 20px rgba(57, 255, 20, 0.45);
   --glow-red:      0 0 20px rgba(255, 68, 102, 0.4);
 
-  --border-dim:    rgba(59, 123, 255, 0.1);
-  --border-mid:    rgba(59, 123, 255, 0.25);
-  --border-bright: rgba(0, 229, 255, 0.5);
+  --border-dim:    rgba(57, 255, 20, 0.12);
+  --border-mid:    rgba(57, 255, 20, 0.28);
+  --border-bright: rgba(57, 255, 20, 0.55);
 
-  --text-primary:  #e8f0ff;
-  --text-secondary:#7a91b8;
-  --text-muted:    #3d5070;
+  --text-primary:  #e8f8ec;
+  --text-secondary:#7aab8e;
+  --text-muted:    #3d5c48;
 
   --radius-sm:  12px;
   --radius-md:  20px;
   --radius-lg:  28px;
   --radius-full: 9999px;
   --font-display: 'Syne', sans-serif;
-  --font-body:    'DM Sans', sans-serif;
+  --font-body:    'Assistant', 'DM Sans', sans-serif;
   --transition:   0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -56,7 +56,7 @@
   border-radius: var(--radius-lg);
   padding: 18px;
   backdrop-filter: blur(20px);
-  box-shadow: 0 0 0 1px rgba(0,229,255,0.04), 0 20px 60px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 1px rgba(57,255,20,0.04), 0 20px 60px rgba(0,0,0,0.4);
   position: relative;
   overflow: hidden;
 }
@@ -195,7 +195,7 @@
   text-align: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(0,229,255,0.04), 0 32px 80px rgba(0,0,0,0.5);
+  box-shadow: 0 0 0 1px rgba(57,255,20,0.04), 0 32px 80px rgba(0,0,0,0.5);
 }
 
 .waiting-card::before, .question-card::before {
@@ -239,9 +239,9 @@
   align-items: center;
   padding: 5px 12px;
   border-radius: var(--radius-full);
-  background: rgba(0,229,255,0.1);
+  background: rgba(57,255,20,0.1);
   color: var(--accent-cyan);
-  border: 1px solid rgba(0,229,255,0.2);
+  border: 1px solid rgba(57,255,20,0.2);
   font-weight: 700;
   font-size: 0.8rem;
   letter-spacing: 0.06em;
@@ -316,7 +316,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(59,123,255,0.12), transparent);
+  background: linear-gradient(135deg, rgba(57, 255, 20, 0.1), transparent);
   opacity: 0;
   transition: var(--transition);
 }
@@ -336,13 +336,13 @@
 }
 
 /* Cycle answer button accent colors */
-.answer-btn:nth-child(1) { --btn-accent: #3b7bff; }
-.answer-btn:nth-child(2) { --btn-accent: #00e5ff; }
+.answer-btn:nth-child(1) { --btn-accent: #22c55e; }
+.answer-btn:nth-child(2) { --btn-accent: #39ff14; }
 .answer-btn:nth-child(3) { --btn-accent: #7c3aed; }
 .answer-btn:nth-child(4) { --btn-accent: #00ffa3; }
 
-.answer-btn:nth-child(1):hover:not(:disabled) { border-color: #3b7bff; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(59,123,255,0.4); }
-.answer-btn:nth-child(2):hover:not(:disabled) { border-color: #00e5ff; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(0,229,255,0.4); }
+.answer-btn:nth-child(1):hover:not(:disabled) { border-color: #22c55e; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(57,255,20,0.35); }
+.answer-btn:nth-child(2):hover:not(:disabled) { border-color: #39ff14; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(57,255,20,0.4); }
 .answer-btn:nth-child(3):hover:not(:disabled) { border-color: #7c3aed; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(124,58,237,0.4); }
 .answer-btn:nth-child(4):hover:not(:disabled) { border-color: #00ffa3; box-shadow: 0 10px 28px rgba(0,0,0,0.3), 0 0 20px rgba(0,255,163,0.4); }
 
@@ -368,7 +368,7 @@
   border-radius: 50%;
   animation: spin 0.85s linear infinite;
   margin: 24px auto 0;
-  box-shadow: 0 0 16px rgba(0,229,255,0.25);
+  box-shadow: 0 0 16px rgba(57,255,20,0.25);
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -377,12 +377,12 @@
    FINISHED CARD — PODIUM
    ============================================================ */
 .finished-card {
-  background: linear-gradient(160deg, #060c1a 0%, #0b1629 60%, #0d1f3c 100%);
+  background: linear-gradient(160deg, #020502 0%, #051208 55%, #081a0f 100%);
   border: 1px solid var(--border-mid);
   border-radius: var(--radius-lg);
   padding: 2.5rem 2rem;
   text-align: center;
-  box-shadow: 0 0 0 1px rgba(0,229,255,0.06), 0 40px 100px rgba(0,0,0,0.6);
+  box-shadow: 0 0 0 1px rgba(57,255,20,0.06), 0 40px 100px rgba(0,0,0,0.6);
   position: relative;
   overflow: hidden;
 }
@@ -393,8 +393,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(59,123,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59,123,255,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(57, 255, 20, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(57, 255, 20, 0.04) 1px, transparent 1px);
   background-size: 32px 32px;
   pointer-events: none;
 }
