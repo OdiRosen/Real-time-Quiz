@@ -17,6 +17,9 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() quizId = 0;
 
   players: any[] = [];
+  /** שלושת המנצחים הקבועים — לא מתעדכן כשמישהו עוזב */
+  finalWinners: { playerName: string; avatar: string; score: number }[] = [];
+  private podiumLocked = false;
   shuffledAnswers: string[] = [];
   currentQuestion: any = null;
   playerId = '';
@@ -235,13 +238,15 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
             }
           });
 
-          this.players = data.map(p => ({
-            playerName: (p.displayName || p.name || 'שחקן').trim(),
-            avatar: p.image || '',
-            score: p.score ?? 0,
-            hasAnswered: p.hasAnswered || false,
-            answerStatus: p.lastAnswerStatus || 'none'
-          })).sort((a, b) => b.score - a.score);
+          if (!this.isFinished) {
+            this.players = data.map(p => ({
+              playerName: (p.displayName || p.name || 'שחקן').trim(),
+              avatar: p.image || '',
+              score: p.score ?? 0,
+              hasAnswered: p.hasAnswered || false,
+              answerStatus: p.lastAnswerStatus || 'none'
+            })).sort((a, b) => b.score - a.score);
+          }
 
           this.cdr.detectChanges();
         },
@@ -272,14 +277,61 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
     return colors[Math.abs(hash % colors.length)];
   }
 
-  saveFinalWinner() {
-    if (this.players.length > 0) {
-      const winner = this.players[0];
-      this.quizService.saveWinner(this.quizId, winner.playerName, winner.score).subscribe({
-        next: () => console.log('הזוכה נשמר בהצלחה!'),
-        error: (err) => console.error('שגיאה בשמירת הזוכה:', err)
-      });
+  private lockPodiumFromLiveLeaderboard() {
+    if (this.podiumLocked) return;
+    this.podiumLocked = true;
+
+    const top3 = this.players.slice(0, 3).map(p => ({
+      playerName: p.playerName,
+      avatar: p.avatar || '',
+      score: p.score ?? 0
+    }));
+
+    if (top3.length === 0) {
+      this.loadPodiumFromServer();
+      return;
     }
+
+    this.finalWinners = top3;
+    this.persistTopWinners(top3);
+    this.cdr.detectChanges();
+  }
+
+  private loadPodiumFromServer() {
+    this.quizService.getTopWinners(this.quizId).subscribe({
+      next: (rows) => {
+        if (rows?.length) {
+          this.finalWinners = rows.map(r => ({
+            playerName: r.playerName,
+            avatar: r.image || '',
+            score: r.score ?? 0
+          }));
+          this.podiumLocked = true;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {}
+    });
+  }
+
+  private persistTopWinners(
+    top3: { playerName: string; avatar: string; score: number }[]
+  ) {
+    this.quizService.saveTopWinners(
+      this.quizId,
+      top3.map(w => ({
+        playerName: w.playerName,
+        score: w.score,
+        image: w.avatar
+      }))
+    ).subscribe({
+      next: () => console.log('שלושת המנצחים נשמרו ב-DB'),
+      error: (err) => console.error('שגיאה בשמירת המנצחים:', err)
+    });
+  }
+
+  saveFinalWinner() {
+    this.lockPodiumFromLiveLeaderboard();
   }
 
   calculateOffset(): number {

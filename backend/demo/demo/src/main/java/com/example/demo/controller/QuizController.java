@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Player; // וודאי שייבאת את ה-Model של השחקן
+import com.example.demo.model.Player;
 import com.example.demo.model.Quiz;
+import com.example.demo.model.QuizWinner;
 import com.example.demo.repository.QuizRepository;
 import com.example.demo.service.PlayerService; // הוספנו את השירות של השחקנים
 import com.example.demo.service.QuestionService;
@@ -95,21 +96,34 @@ public class QuizController {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @PatchMapping("/{id}/winner")
     public ResponseEntity<?> saveWinner(
             @PathVariable Long id,
             @RequestBody Map<String, Object> body) {
         try {
+            if (body.containsKey("winners") && body.get("winners") instanceof List) {
+                List<Map<String, Object>> winners = (List<Map<String, Object>>) body.get("winners");
+                List<QuizWinner> saved = quizService.saveTopWinners(id, winners);
+                return ResponseEntity.ok(Map.of("winners", saved));
+            }
+
             String winnerName = (String) body.get("winnerName");
-            // המרה בטוחה ל-Integer
             Object scoreObj = body.get("winnerScore");
-            Integer winnerScore = (scoreObj instanceof Integer) ? (Integer) scoreObj : Integer.parseInt(scoreObj.toString());
+            Integer winnerScore = (scoreObj instanceof Integer)
+                    ? (Integer) scoreObj
+                    : Integer.parseInt(scoreObj.toString());
 
             Quiz updated = quizService.saveWinner(id, winnerName, winnerScore);
             return ResponseEntity.ok(updated);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GetMapping("/{id}/winners")
+    public ResponseEntity<List<QuizWinner>> getTopWinners(@PathVariable Long id) {
+        return ResponseEntity.ok(quizService.getTopWinners(id));
     }
 
     @DeleteMapping("/{id}")

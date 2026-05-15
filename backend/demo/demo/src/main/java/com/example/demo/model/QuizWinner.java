@@ -1,24 +1,34 @@
 package com.example.demo.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "quiz_winners")
 public class QuizWinner {
 
-    @Id // השורה הזו חסרה לך! היא קובעת שזה המפתח הראשי
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private Long quizId;
+
+    /** דירוג 1–3 */
+    private int rank;
 
     private String playerName;
     private int score;
-    private long totalTimeMillis;
+    private String image;
 
-    // קונסטרקטור ריק (חובה ל-JPA)
     public QuizWinner() {}
 
-    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
     public Long getQuizId() { return quizId; }
     public void setQuizId(Long quizId) { this.quizId = quizId; }
+
+    public int getRank() { return rank; }
+    public void setRank(int rank) { this.rank = rank; }
 
     public String getPlayerName() { return playerName; }
     public void setPlayerName(String playerName) { this.playerName = playerName; }
@@ -26,6 +36,6 @@ public class QuizWinner {
     public int getScore() { return score; }
     public void setScore(int score) { this.score = score; }
 
-    public long getTotalTimeMillis() { return totalTimeMillis; }
-    public void setTotalTimeMillis(long totalTimeMillis) { this.totalTimeMillis = totalTimeMillis; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }

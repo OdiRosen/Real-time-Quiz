@@ -12,6 +12,15 @@ export interface Quiz {
   winnerScore?: number;
 }
 
+export interface QuizTopWinner {
+  id?: number;
+  quizId?: number;
+  rank: number;
+  playerName: string;
+  score: number;
+  image?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -49,6 +58,23 @@ export class QuizService {
       winnerName,
       winnerScore
     });
+  }
+
+  saveTopWinners(
+    quizId: number,
+    winners: { playerName: string; score: number; image?: string }[]
+  ): Observable<{ winners: QuizTopWinner[] }> {
+    return this.http.patch<{ winners: QuizTopWinner[] }>(`${this.apiUrl}/${quizId}/winner`, {
+      winners: winners.map((w, i) => ({
+        playerName: w.playerName,
+        score: w.score,
+        image: w.image || ''
+      }))
+    });
+  }
+
+  getTopWinners(quizId: number): Observable<QuizTopWinner[]> {
+    return this.http.get<QuizTopWinner[]>(`${this.apiUrl}/${quizId}/winners`);
   }
 
 }

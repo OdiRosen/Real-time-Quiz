@@ -35,45 +35,45 @@
       <p class="finish-subtitle">תודה שהשתתפת — הנה תוצאות הגמר</p>
     </div>
 
-    <div *ngIf="players.length > 0" class="podium-wrapper">
-      <div class="podium-card gold" *ngIf="players[0]">
+    <div *ngIf="finalWinners.length > 0" class="podium-wrapper">
+      <div class="podium-card gold" *ngIf="finalWinners[0]">
         <div class="medal">🥇</div>
-        <img *ngIf="players[0].avatar?.startsWith('http')" [src]="players[0].avatar" />
-        <div *ngIf="!players[0].avatar?.startsWith('http')" class="podium-initials"
-             [style.background-color]="getAvatarColor(players[0].playerName)">
-          {{ (players[0].playerName || 'U').slice(0,1).toUpperCase() }}
+        <img *ngIf="finalWinners[0].avatar?.startsWith('http')" [src]="finalWinners[0].avatar" />
+        <div *ngIf="!finalWinners[0].avatar?.startsWith('http')" class="podium-initials"
+             [style.background-color]="getAvatarColor(finalWinners[0].playerName)">
+          {{ (finalWinners[0].playerName || 'U').slice(0,1).toUpperCase() }}
         </div>
-        <span class="podium-name">{{ players[0].playerName }}</span>
-        <span class="podium-score">{{ players[0].score }} נקודות</span>
+        <span class="podium-name">{{ finalWinners[0].playerName }}</span>
+        <span class="podium-score">{{ finalWinners[0].score }} נקודות</span>
         <div class="podium-block gold-block">1</div>
       </div>
 
-      <div class="podium-card silver" *ngIf="players[1]">
+      <div class="podium-card silver" *ngIf="finalWinners[1]">
         <div class="medal">🥈</div>
-        <img *ngIf="players[1].avatar?.startsWith('http')" [src]="players[1].avatar" />
-        <div *ngIf="!players[1].avatar?.startsWith('http')" class="podium-initials"
-             [style.background-color]="getAvatarColor(players[1].playerName)">
-          {{ (players[1].playerName || 'U').slice(0,1).toUpperCase() }}
+        <img *ngIf="finalWinners[1].avatar?.startsWith('http')" [src]="finalWinners[1].avatar" />
+        <div *ngIf="!finalWinners[1].avatar?.startsWith('http')" class="podium-initials"
+             [style.background-color]="getAvatarColor(finalWinners[1].playerName)">
+          {{ (finalWinners[1].playerName || 'U').slice(0,1).toUpperCase() }}
         </div>
-        <span class="podium-name">{{ players[1].playerName }}</span>
-        <span class="podium-score">{{ players[1].score }} נקודות</span>
+        <span class="podium-name">{{ finalWinners[1].playerName }}</span>
+        <span class="podium-score">{{ finalWinners[1].score }} נקודות</span>
         <div class="podium-block silver-block">2</div>
       </div>
 
-      <div class="podium-card bronze" *ngIf="players[2]">
+      <div class="podium-card bronze" *ngIf="finalWinners[2]">
         <div class="medal">🥉</div>
-        <img *ngIf="players[2].avatar?.startsWith('http')" [src]="players[2].avatar" />
-        <div *ngIf="!players[2].avatar?.startsWith('http')" class="podium-initials"
-             [style.background-color]="getAvatarColor(players[2].playerName)">
-          {{ (players[2].playerName || 'U').slice(0,1).toUpperCase() }}
+        <img *ngIf="finalWinners[2].avatar?.startsWith('http')" [src]="finalWinners[2].avatar" />
+        <div *ngIf="!finalWinners[2].avatar?.startsWith('http')" class="podium-initials"
+             [style.background-color]="getAvatarColor(finalWinners[2].playerName)">
+          {{ (finalWinners[2].playerName || 'U').slice(0,1).toUpperCase() }}
         </div>
-        <span class="podium-name">{{ players[2].playerName }}</span>
-        <span class="podium-score">{{ players[2].score }} נקודות</span>
+        <span class="podium-name">{{ finalWinners[2].playerName }}</span>
+        <span class="podium-score">{{ finalWinners[2].score }} נקודות</span>
         <div class="podium-block bronze-block">3</div>
       </div>
     </div>
 
-    <div *ngIf="players.length === 0" class="hint">אין נתוני שחקנים להצגה.</div>
+    <div *ngIf="finalWinners.length === 0" class="hint">טוען תוצאות גמר...</div>
   </section>
 
   <!-- ===== מסך המתנה/טעינה ===== -->
