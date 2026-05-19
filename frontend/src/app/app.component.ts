@@ -62,6 +62,7 @@
     quizCode = '';
     playerMessage = '';
     isJoined = false;
+    isJoining = false;
     playerData: any = null;
     selectedQuizId = 0;
     adminEmail = '';
@@ -311,35 +312,58 @@
       return colors[index];
     }
 
+  private sessionKey(quizId: number): string {
+    return `quiz_player_${quizId}`;
+  }
+
   onPlayerJoin() {
     if (!this.quizCode) {
       this.playerMessage = 'יש להזין קוד חידון.';
       return;
     }
+    if (this.isJoined || this.isJoining) {
+      return;
+    }
+
     const quizId = Number(this.quizCode);
+    if (!quizId || Number.isNaN(quizId)) {
+      this.playerMessage = 'קוד חידון לא תקין.';
+      return;
+    }
+
     const finalName = this.customDisplayName.trim() || this.currentUser?.name || 'שחקן';
     const finalAvatar = this.selectedEmoji !== 'default' ? this.selectedEmoji : (this.currentUser?.photoUrl || '');
+    const storedPlayerId = sessionStorage.getItem(this.sessionKey(quizId)) || undefined;
 
     this.selectedQuizId = quizId;
+    this.isJoining = true;
     this.playerMessage = 'מצטרף לחידון...';
 
-    // שימוש ב-this.playerService (ולא ב-subscribe)
-    this.playerService.joinQuiz(quizId, finalName, finalAvatar).subscribe({
-      next: (player: any) => { // הוספנו : any כאן
+    this.playerService.joinQuiz(quizId, finalName, finalAvatar, storedPlayerId).subscribe({
+      next: (player: any) => {
+        const playerId = player.playerId || player.id;
+        if (playerId) {
+          sessionStorage.setItem(this.sessionKey(quizId), playerId);
+        }
+
         this.playerData = {
           ...player,
-          playerName: finalName,
-          avatar: finalAvatar
+          playerId,
+          playerName: player.displayName || finalName,
+          avatar: player.image || finalAvatar
         };
         this.isJoined = true;
+        this.isJoining = false;
         this.playerMessage = '';
 
-        // קריטי: הפעלת ההאזנה ל-WebSocket מיד אחרי ההצטרפות
+        this.playerService.connectToQuiz(quizId);
         this.playerService.getLeaderboardUpdates(quizId);
       },
-      error: (err: any) => { // הוספנו : any כאן
+      error: (err: any) => {
         console.error(err);
-        this.playerMessage = err.status === 403 ? 'החידון סגור.' : 'שגיאה בהצטרפות.';
+        this.isJoining = false;
+        const msg = err.error?.error;
+        this.playerMessage = msg || (err.status === 403 ? 'החידון סגור.' : 'שגיאה בהצטרפות.');
       }
     });
   }

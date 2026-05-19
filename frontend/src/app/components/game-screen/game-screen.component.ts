@@ -2,8 +2,7 @@ import { Component, OnDestroy, Input, inject, OnInit, OnChanges, SimpleChanges, 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { PlayerService } from '../../services/player.service';
-import { QuizService } from '../../services/quiz.service';
+import { PlayerService, PodiumEntry } from '../../services/player.service';
 
 @Component({
   selector: 'app-game-screen',
@@ -17,9 +16,8 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   @Input() quizId = 0;
 
   players: any[] = [];
-  /** שלושת המנצחים הקבועים — לא מתעדכן כשמישהו עוזב */
+  /** שלושת המנצחים — מסונכרן מהשרת (DB + WebSocket) */
   finalWinners: { playerName: string; avatar: string; score: number }[] = [];
-  private podiumLocked = false;
   shuffledAnswers: string[] = [];
   currentQuestion: any = null;
   playerId = '';
@@ -37,8 +35,8 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   timerInterval: any = null;
 
   private leaderboardSub: Subscription | null = null;
+  private podiumSub: Subscription | null = null;
   private playerService = inject(PlayerService);
-  private quizService = inject(QuizService);
   private cdr = inject(ChangeDetectorRef);
 
   // FIX: כשסוגרים טאב/דפדפן — מודיעים לשרת
@@ -69,6 +67,7 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     this.leaderboardSub?.unsubscribe();
+    this.podiumSub?.unsubscribe();
     this.clearTimer();
     // ניתוק WebSocket בעת השמדת הקומפוננט
     if (this.playerId && this.quizId) {
@@ -98,7 +97,6 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
           this.isFinished = true;
           this.currentQuestion = null;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
-          this.saveFinalWinner();
           this.cdr.detectChanges();
           return;
         }
@@ -119,7 +117,6 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
         if (err.status === 204) {
           this.isFinished = true;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
-          this.saveFinalWinner();
         } else {
           this.statusMessage = 'שגיאה בטעינת השאלה. מנסה שוב...';
           setTimeout(() => this.loadQuestionFromServer(), 1500);
@@ -156,7 +153,6 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
           this.isFinished = true;
           this.currentQuestion = null;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
-          this.saveFinalWinner();
           this.cdr.detectChanges();
           return;
         }
@@ -182,7 +178,6 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
           this.isFinished = true;
           this.currentQuestion = null;
           this.statusMessage = 'החידון הסתיים! תודה שהשתתפת 🎉';
-          this.saveFinalWinner();
           this.cdr.detectChanges();
           return;
         }
@@ -202,6 +197,11 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   subscribeLeaderboard() {
+    this.podiumSub = this.playerService.getPodiumUpdates().subscribe({
+      next: (rows) => this.applyPodium(rows),
+      error: () => {}
+    });
+
     this.leaderboardSub = this.playerService.getLeaderboardUpdates(this.quizId)
       .subscribe({
         next: (data: any[]) => {
@@ -277,61 +277,16 @@ export class GameScreenComponent implements OnInit, OnChanges, OnDestroy {
     return colors[Math.abs(hash % colors.length)];
   }
 
-  private lockPodiumFromLiveLeaderboard() {
-    if (this.podiumLocked) return;
-    this.podiumLocked = true;
-
-    const top3 = this.players.slice(0, 3).map(p => ({
-      playerName: p.playerName,
-      avatar: p.avatar || '',
-      score: p.score ?? 0
-    }));
-
-    if (top3.length === 0) {
-      this.loadPodiumFromServer();
-      return;
-    }
-
-    this.finalWinners = top3;
-    this.persistTopWinners(top3);
+  private applyPodium(rows: PodiumEntry[]) {
+    if (!rows?.length) return;
+    this.finalWinners = rows
+      .sort((a, b) => a.rank - b.rank)
+      .map(r => ({
+        playerName: r.playerName,
+        avatar: r.image || '',
+        score: r.score ?? 0
+      }));
     this.cdr.detectChanges();
-  }
-
-  private loadPodiumFromServer() {
-    this.quizService.getTopWinners(this.quizId).subscribe({
-      next: (rows) => {
-        if (rows?.length) {
-          this.finalWinners = rows.map(r => ({
-            playerName: r.playerName,
-            avatar: r.image || '',
-            score: r.score ?? 0
-          }));
-          this.podiumLocked = true;
-          this.cdr.detectChanges();
-        }
-      },
-      error: () => {}
-    });
-  }
-
-  private persistTopWinners(
-    top3: { playerName: string; avatar: string; score: number }[]
-  ) {
-    this.quizService.saveTopWinners(
-      this.quizId,
-      top3.map(w => ({
-        playerName: w.playerName,
-        score: w.score,
-        image: w.avatar
-      }))
-    ).subscribe({
-      next: () => console.log('שלושת המנצחים נשמרו ב-DB'),
-      error: (err) => console.error('שגיאה בשמירת המנצחים:', err)
-    });
-  }
-
-  saveFinalWinner() {
-    this.lockPodiumFromLiveLeaderboard();
   }
 
   calculateOffset(): number {

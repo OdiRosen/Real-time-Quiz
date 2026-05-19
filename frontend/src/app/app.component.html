@@ -47,7 +47,7 @@
       </div>
       <button type="button" class="auth-back-btn" (click)="resetRole()">
         חזרה
-        <span class="auth-back-chevron" aria-hidden="true">&lt;</span>
+        <span class="auth-back-chevron" aria-hidden="true">>;</span>
       </button>
     </header>
 
@@ -183,7 +183,9 @@
     </div>
 
     <div class="form-actions">
-      <button class="primary-btn" (click)="onPlayerJoin()" [disabled]="!quizCode">הצטרף והתחל</button>
+      <button class="primary-btn" (click)="onPlayerJoin()" [disabled]="!quizCode || isJoining || isJoined">
+        {{ isJoining ? 'מצטרף...' : 'הצטרף והתחל' }}
+      </button>
     </div>
 
     <p class="hint" [class.error-hint]="playerMessage.includes('שגיאה') || playerMessage.includes('סגור')">

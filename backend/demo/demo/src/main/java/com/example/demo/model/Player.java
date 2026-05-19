@@ -19,6 +19,8 @@ public class Player {
 
     private boolean hasAnswered = false;
     private String lastAnswerStatus = "none";
+    /** סיים את כל השאלות — נשאר בטבלת המנצחים גם אחרי ניתוק */
+    private boolean finished = false;
 
     // בנאי ריק חובה ל-JPA
     public Player() {}
@@ -50,4 +52,7 @@ public class Player {
 
     public String getLastAnswerStatus() { return lastAnswerStatus; }
     public void setLastAnswerStatus(String lastAnswerStatus) { this.lastAnswerStatus = lastAnswerStatus; }
+
+    public boolean isFinished() { return finished; }
+    public void setFinished(boolean finished) { this.finished = finished; }
 }

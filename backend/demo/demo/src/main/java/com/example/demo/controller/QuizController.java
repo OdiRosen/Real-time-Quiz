@@ -47,7 +47,9 @@ public class QuizController {
                          SimpMessageHeaderAccessor headerAccessor) {
 
         // 1. קריאה לפונקציה ששלחת (היא מצוינת, היא תחזיר שחקן קיים או חדש)
-        Player joinedPlayer = playerService.joinQuiz(quizId, player.getDisplayName(), player.getImage());
+        String reconnectId = player.getPlayerId();
+        Player joinedPlayer = playerService.joinQuiz(
+                quizId, player.getDisplayName(), player.getImage(), reconnectId);
 
         // 2. השורה הקריטית למחיקה: שמירת ה-ID בתוך ה-Session של ה-WebSocket
         if (headerAccessor.getSessionAttributes() != null) {

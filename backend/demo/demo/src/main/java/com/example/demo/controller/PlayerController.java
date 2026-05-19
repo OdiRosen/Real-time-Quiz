@@ -20,15 +20,22 @@ public class PlayerController {
     private PlayerService playerService;
 
     @PostMapping("/{quizId}/join")
-    public ResponseEntity<Player> join(@PathVariable Long quizId,
-                                       @RequestParam String name,
-                                       @RequestParam String image) {
+    public ResponseEntity<?> join(@PathVariable Long quizId,
+                                  @RequestParam String name,
+                                  @RequestParam String image,
+                                  @RequestParam(required = false) String playerId) {
         try {
-            Player player = playerService.joinQuiz(quizId, name, image);
+            Player player = playerService.joinQuiz(quizId, name, image, playerId);
             return ResponseEntity.ok(player);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", e.getMessage()));
         }
+    }
+
+    @GetMapping("/{quizId}/podium")
+    public ResponseEntity<List<com.example.demo.model.QuizWinner>> getPodium(@PathVariable Long quizId) {
+        return ResponseEntity.ok(playerService.getTopWinners(quizId));
     }
 
     // endpoint חדש — שחקן עוזב
