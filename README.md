@@ -45,45 +45,39 @@ The application is built using a decoupled client-server architecture, ensuring 
 1. Navigate to the backend directory:
    ```bash
    cd backend
-
-```
+   ```
 
 2. Build the project:
-```bash
+   ```bash
 mvn clean install
-
-```
+   ```
 
 
 3. Run the Spring Boot application:
-```bash
+   ```bash
 mvn spring-boot:run
-
-```
+   ```
 
 
 
 ### Frontend Setup
 
 1. Navigate to the frontend directory:
-```bash
+   ```bash
 cd frontend
-
-```
+   ```
 
 
 2. Install dependencies:
-```bash
+   ```bash
 npm install
-
-```
+   ```
 
 
 3. Start the development server:
-```bash
+   ```bash
 ng serve
-
-```
+   ```
 
 
 4. Open `http://localhost:4200` in your browser.
