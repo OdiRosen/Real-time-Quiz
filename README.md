@@ -49,13 +49,13 @@ The application is built using a decoupled client-server architecture, ensuring 
 
 2. Build the project:
    ```bash
-mvn clean install
+   mvn clean install
    ```
 
 
 3. Run the Spring Boot application:
    ```bash
-mvn spring-boot:run
+   mvn spring-boot:run
    ```
 
 
@@ -64,19 +64,19 @@ mvn spring-boot:run
 
 1. Navigate to the frontend directory:
    ```bash
-cd frontend
+   cd frontend
    ```
 
 
 2. Install dependencies:
    ```bash
-npm install
+   npm install
    ```
 
 
 3. Start the development server:
    ```bash
-ng serve
+   ng serve
    ```
 
 
